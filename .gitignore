@@ -31,3 +31,8 @@ coverage.xml
 
 # DB
 *.sqlite3
+
+# Python venv
+.venv/
+venv/
+env/
