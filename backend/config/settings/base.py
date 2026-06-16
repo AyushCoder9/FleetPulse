@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'apps.invoices',
     'apps.anomalies',
     'apps.dashboard',
+    'apps.analytics',
 ]
 
 MIDDLEWARE = [
@@ -75,8 +76,12 @@ CELERY_RESULT_BACKEND = env('REDIS_URL', default='redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
+CLERK_JWKS_URL = env('CLERK_JWKS_URL', default='')
+CLERK_ISSUER = env('CLERK_ISSUER', default='')
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'apps.core.auth.clerk_backend.ClerkJWTAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [

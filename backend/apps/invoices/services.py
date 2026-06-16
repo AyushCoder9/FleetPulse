@@ -21,7 +21,8 @@ class InvoiceReconciliationService:
             anomaly = self.anomaly_repo.create_from_flag(invoice.id, flag)
             created_flags.append(anomaly)
 
-        if flags:
+        actionable = [f for f in flags if f.severity in ('medium', 'high')]
+        if actionable:
             self.invoice_repo.update(invoice, status='flagged')
 
         return created_flags

@@ -6,6 +6,6 @@ from .models import Invoice
 
 @receiver(post_save, sender=Invoice)
 def invoice_created(sender, instance, created, **kwargs):
-    if created:
+    if created and instance.status == 'pending':
         from .tasks import reconcile_invoice
         reconcile_invoice.delay(instance.id)

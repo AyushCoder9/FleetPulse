@@ -32,6 +32,7 @@ class DashboardSummaryView(APIView):
         flagged_count = Invoice.objects.filter(
             organization_id__in=org_ids,
             status='flagged',
+            is_deleted=False,
         ).count()
 
         supplier_scores = []

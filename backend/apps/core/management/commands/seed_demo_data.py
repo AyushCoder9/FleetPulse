@@ -74,8 +74,12 @@ class Command(BaseCommand):
         self.stdout.write('Seeding organizations...')
         org_names = ['Acme Fleet Solutions', 'Metro Logistics Co', 'SunBelt Transport']
         orgs = []
-        for name in org_names:
-            org = Organization.objects.create(name=name, plan=random.choice(['starter', 'pro', 'enterprise']))
+        for i, name in enumerate(org_names):
+            org = Organization.objects.create(
+                name=name,
+                plan=random.choice(['starter', 'pro', 'enterprise']),
+                is_demo=(i == 0),  # first org is the shared demo org
+            )
             orgs.append(org)
 
         # Create users + memberships
