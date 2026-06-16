@@ -16,7 +16,9 @@ export default function DemoPage() {
     if (attempted.current) return
     attempted.current = true
 
-    login('admin', 'password')
+    const u = import.meta.env.VITE_DEMO_USERNAME ?? 'admin'
+    const p = import.meta.env.VITE_DEMO_PASSWORD ?? 'password'
+    login(u, p)
       .then(() => navigate('/app/dashboard', { replace: true }))
       .catch(() => navigate('/login', { replace: true }))
   }, [token, login, navigate])
