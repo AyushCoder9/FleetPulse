@@ -1,12 +1,13 @@
 import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
-import { invoices } from '@/lib/mock-data'
+import { Skeleton } from '@/components/ui/skeleton'
+import { api } from '@/lib/api'
+import type { Invoice } from '@/lib/api'
 import { toast } from 'sonner'
-
-type Invoice = typeof invoices[0]
 
 const statusVariant: Record<string, 'default' | 'destructive' | 'secondary'> = {
   flagged: 'destructive',
@@ -15,23 +16,36 @@ const statusVariant: Record<string, 'default' | 'destructive' | 'secondary'> = {
 }
 
 export default function InvoicesPage() {
-  const [data, setData] = useState(invoices)
+  const queryClient = useQueryClient()
   const [selected, setSelected] = useState<Invoice | null>(null)
   const [filter, setFilter] = useState<'all' | 'flagged' | 'pending' | 'approved'>('all')
 
-  const filtered = filter === 'all' ? data : data.filter(i => i.status === filter)
+  const { data: invoices = [], isLoading } = useQuery({
+    queryKey: ['invoices', filter],
+    queryFn: () => api.invoices(filter === 'all' ? undefined : filter),
+  })
 
-  function approve(id: string) {
-    setData(prev => prev.map(i => i.id === id ? { ...i, status: 'approved' } : i))
-    setSelected(null)
-    toast.success(`Invoice ${id} approved`)
-  }
+  const approveMutation = useMutation({
+    mutationFn: (id: number) => api.approveInvoice(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      toast.success('Invoice approved')
+      setSelected(null)
+    },
+    onError: () => toast.error('Failed to approve invoice'),
+  })
 
-  function flag(id: string) {
-    setData(prev => prev.map(i => i.id === id ? { ...i, status: 'flagged' } : i))
-    setSelected(null)
-    toast.error(`Invoice ${id} flagged`)
-  }
+  const flagMutation = useMutation({
+    mutationFn: (id: number) => api.flagInvoice(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      toast.error('Invoice flagged')
+      setSelected(null)
+    },
+    onError: () => toast.error('Failed to flag invoice'),
+  })
 
   return (
     <div className="p-6 space-y-4">
@@ -58,35 +72,54 @@ export default function InvoicesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Invoice</TableHead>
+              <TableHead>ID</TableHead>
               <TableHead>Supplier</TableHead>
               <TableHead>Vehicle</TableHead>
               <TableHead>Service</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Anomaly</TableHead>
+              <TableHead>Date</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map(inv => (
-              <TableRow
-                key={inv.id}
-                className="cursor-pointer"
-                onClick={() => setSelected(inv)}
-              >
-                <TableCell className="font-mono text-sm">{inv.id}</TableCell>
-                <TableCell>{inv.supplier}</TableCell>
-                <TableCell className="font-mono text-sm">{inv.vehicle}</TableCell>
-                <TableCell>{inv.service}</TableCell>
-                <TableCell>${inv.amount.toLocaleString()}</TableCell>
-                <TableCell>
-                  <Badge variant={statusVariant[inv.status]} className="capitalize">
-                    {inv.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">{inv.anomaly ?? '—'}</TableCell>
-              </TableRow>
-            ))}
+            {isLoading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    {Array.from({ length: 7 }).map((_, j) => (
+                      <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              : invoices.length === 0
+              ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                      No invoices found
+                    </TableCell>
+                  </TableRow>
+                )
+              : invoices.map(inv => (
+                  <TableRow
+                    key={inv.id}
+                    className="cursor-pointer"
+                    onClick={() => setSelected(inv)}
+                  >
+                    <TableCell className="font-mono text-sm">#{inv.id}</TableCell>
+                    <TableCell>{inv.supplier_name}</TableCell>
+                    <TableCell className="font-mono text-sm">{inv.vehicle_vin}</TableCell>
+                    <TableCell>{inv.service_type}</TableCell>
+                    <TableCell>${Number(inv.total_amount).toLocaleString()}</TableCell>
+                    <TableCell>
+                      <Badge variant={statusVariant[inv.status]} className="capitalize">
+                        {inv.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(inv.created_at).toLocaleDateString()}
+                    </TableCell>
+                  </TableRow>
+                ))
+            }
           </TableBody>
         </Table>
       </div>
@@ -94,29 +127,51 @@ export default function InvoicesPage() {
       <Sheet open={!!selected} onOpenChange={(open: boolean) => !open && setSelected(null)}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>{selected?.id}</SheetTitle>
-            <SheetDescription>{selected?.supplier} · {selected?.vehicle}</SheetDescription>
+            <SheetTitle>Invoice #{selected?.id}</SheetTitle>
+            <SheetDescription>{selected?.supplier_name} · {selected?.vehicle_vin}</SheetDescription>
           </SheetHeader>
           {selected && (
             <div className="mt-6 space-y-4">
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Service</span><span>{selected.service}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-semibold">${selected.amount.toLocaleString()}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Status</span>
-                  <Badge variant={statusVariant[selected.status]} className="capitalize">{selected.status}</Badge>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Service</span>
+                  <span>{selected.service_type}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Amount</span>
+                  <span className="font-semibold">${Number(selected.total_amount).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Date</span>
+                  <span>{new Date(selected.created_at).toLocaleDateString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Status</span>
+                  <Badge variant={statusVariant[selected.status]} className="capitalize">
+                    {selected.status}
+                  </Badge>
                 </div>
               </div>
-              {selected.anomaly && (
+              {selected.status === 'flagged' && (
                 <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
-                  <strong>Anomaly detected:</strong> {selected.anomaly}
+                  <strong>Anomaly detected</strong> — this invoice has been flagged for review.
                 </div>
               )}
               <div className="flex gap-2 pt-2">
-                <Button className="flex-1" onClick={() => approve(selected.id)} disabled={selected.status === 'approved'}>
-                  Approve
+                <Button
+                  className="flex-1"
+                  onClick={() => approveMutation.mutate(selected.id)}
+                  disabled={selected.status === 'approved' || approveMutation.isPending}
+                >
+                  {approveMutation.isPending ? 'Approving…' : 'Approve'}
                 </Button>
-                <Button variant="destructive" className="flex-1" onClick={() => flag(selected.id)} disabled={selected.status === 'flagged'}>
-                  Flag
+                <Button
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => flagMutation.mutate(selected.id)}
+                  disabled={selected.status === 'flagged' || flagMutation.isPending}
+                >
+                  {flagMutation.isPending ? 'Flagging…' : 'Flag'}
                 </Button>
               </div>
             </div>

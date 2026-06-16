@@ -1,20 +1,28 @@
+import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { DollarSign, AlertTriangle, Truck, TrendingUp } from 'lucide-react'
-import { kpiData, chartData } from '@/lib/mock-data'
+import { api } from '@/lib/api'
+import { chartData } from '@/lib/mock-data'
 
 function fmt(n: number) {
   return n >= 1000 ? `$${(n / 1000).toFixed(1)}k` : `$${n}`
 }
 
-const kpis = [
-  { label: 'Overcharges Caught', value: fmt(kpiData.overchargesCaught), icon: DollarSign, change: '+12% vs last month' },
-  { label: 'Idle Cost Saved', value: fmt(kpiData.idleCostSaved), icon: Truck, change: '+8% vs last month' },
-  { label: 'Flagged Invoices', value: String(kpiData.flaggedInvoices), icon: AlertTriangle, change: '3 new this week' },
-  { label: 'Avg Supplier Score', value: `${kpiData.supplierScore}/100`, icon: TrendingUp, change: '-2 vs last quarter' },
-]
-
 export default function DashboardPage() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['dashboard'],
+    queryFn: api.dashboard,
+  })
+
+  const kpis = [
+    { label: 'Overcharges Caught', value: data ? fmt(data.overcharges_caught) : null, icon: DollarSign, change: 'From flagged invoices' },
+    { label: 'Idle Cost Saved', value: data ? fmt(data.idle_cost_saved) : null, icon: Truck, change: 'Tracked idle events' },
+    { label: 'Flagged Invoices', value: data ? String(data.flagged_invoice_count) : null, icon: AlertTriangle, change: 'Awaiting review' },
+    { label: 'Avg Supplier Score', value: data ? `${data.avg_supplier_score}/100` : null, icon: TrendingUp, change: 'Across all suppliers' },
+  ]
+
   return (
     <div className="p-6 space-y-6">
       <div>
@@ -30,7 +38,11 @@ export default function DashboardPage() {
               <Icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{value}</p>
+              {isLoading || value === null ? (
+                <Skeleton className="h-8 w-24 mb-1" />
+              ) : (
+                <p className="text-2xl font-bold">{value}</p>
+              )}
               <p className="text-xs text-muted-foreground mt-1">{change}</p>
             </CardContent>
           </Card>
@@ -40,7 +52,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Overcharges Caught (Monthly)</CardTitle>
+            <CardTitle className="text-sm">Overcharges Caught (Monthly — demo)</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
@@ -56,7 +68,7 @@ export default function DashboardPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Idle Cost Trend</CardTitle>
+            <CardTitle className="text-sm">Idle Cost Trend (demo)</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>

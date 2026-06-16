@@ -1,6 +1,9 @@
+import { useQuery } from '@tanstack/react-query'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { vehicles } from '@/lib/mock-data'
+import { Skeleton } from '@/components/ui/skeleton'
+import { api } from '@/lib/api'
+import type { Vehicle } from '@/lib/api'
 import { Truck, Clock, AlertCircle, CheckCircle } from 'lucide-react'
 
 const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive'; icon: React.ComponentType<{ className?: string }> }> = {
@@ -10,8 +13,13 @@ const statusConfig: Record<string, { label: string; variant: 'default' | 'second
 }
 
 export default function VehiclesPage() {
-  const idleCount = vehicles.filter(v => v.status === 'idle').length
-  const activeCount = vehicles.filter(v => v.status === 'active').length
+  const { data: vehicles = [], isLoading } = useQuery({
+    queryKey: ['vehicles'],
+    queryFn: api.vehicles,
+  })
+
+  const idleCount = vehicles.filter((v: Vehicle) => v.status === 'idle').length
+  const activeCount = vehicles.filter((v: Vehicle) => v.status === 'active').length
 
   return (
     <div className="p-6 space-y-6">
@@ -26,45 +34,62 @@ export default function VehiclesPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Vehicles</CardTitle>
             <Truck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent><p className="text-2xl font-bold">{vehicles.length}</p></CardContent>
+          <CardContent>
+            {isLoading ? <Skeleton className="h-8 w-16" /> : <p className="text-2xl font-bold">{vehicles.length}</p>}
+          </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-medium text-muted-foreground">Active</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent><p className="text-2xl font-bold">{activeCount}</p></CardContent>
+          <CardContent>
+            {isLoading ? <Skeleton className="h-8 w-16" /> : <p className="text-2xl font-bold">{activeCount}</p>}
+          </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-medium text-muted-foreground">Idle</CardTitle>
             <AlertCircle className="h-4 w-4 text-destructive" />
           </CardHeader>
-          <CardContent><p className="text-2xl font-bold text-destructive">{idleCount}</p></CardContent>
+          <CardContent>
+            {isLoading ? <Skeleton className="h-8 w-16" /> : <p className="text-2xl font-bold text-destructive">{idleCount}</p>}
+          </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 gap-3">
-        {vehicles.map(v => {
-          const cfg = statusConfig[v.status]
-          const Icon = cfg.icon
-          return (
-            <div key={v.vin} className="flex items-center gap-4 rounded-lg border p-4">
-              <Icon className={`h-5 w-5 ${v.status === 'idle' ? 'text-destructive' : 'text-muted-foreground'}`} />
-              <div className="flex-1 min-w-0">
-                <p className="font-medium">{v.make} {v.model}</p>
-                <p className="text-sm text-muted-foreground font-mono">{v.vin}</p>
-              </div>
-              <Badge variant={cfg.variant}>{cfg.label}</Badge>
-              {v.idleDays > 0 && (
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-destructive">{v.idleDays}d idle</p>
-                  <p className="text-xs text-muted-foreground">{v.rootCause}</p>
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4 rounded-lg border p-4">
+                <Skeleton className="h-5 w-5 rounded-full" />
+                <div className="flex-1 space-y-1">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-20" />
                 </div>
-              )}
-            </div>
-          )
-        })}
+                <Skeleton className="h-6 w-16 rounded-full" />
+              </div>
+            ))
+          : vehicles.length === 0
+          ? (
+              <p className="text-center text-muted-foreground py-8">No vehicles found</p>
+            )
+          : vehicles.map((v: Vehicle) => {
+              const cfg = statusConfig[v.status] ?? statusConfig.active
+              const Icon = cfg.icon
+              return (
+                <div key={v.id} className="flex items-center gap-4 rounded-lg border p-4">
+                  <Icon className={`h-5 w-5 ${v.status === 'idle' ? 'text-destructive' : 'text-muted-foreground'}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium">{v.make} {v.model}</p>
+                    <p className="text-sm text-muted-foreground font-mono">{v.vin}</p>
+                  </div>
+                  <Badge variant={cfg.variant}>{cfg.label}</Badge>
+                  <p className="text-xs text-muted-foreground">{v.odometer.toLocaleString()} mi</p>
+                </div>
+              )
+            })
+        }
       </div>
     </div>
   )

@@ -1,7 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { suppliers } from '@/lib/mock-data'
+import { api } from '@/lib/api'
+import type { Supplier } from '@/lib/api'
 
 function scoreColor(score: number) {
   if (score >= 85) return 'hsl(142, 71%, 45%)'
@@ -10,7 +13,12 @@ function scoreColor(score: number) {
 }
 
 export default function SuppliersPage() {
-  const sorted = [...suppliers].sort((a, b) => b.score - a.score)
+  const { data: suppliers = [], isLoading } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: api.suppliers,
+  })
+
+  const sorted = [...suppliers].sort((a: Supplier, b: Supplier) => b.score - a.score)
 
   return (
     <div className="p-6 space-y-6">
@@ -24,18 +32,22 @@ export default function SuppliersPage() {
           <CardTitle className="text-sm">Score Ranking</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={sorted} layout="vertical">
-              <XAxis type="number" domain={[0, 100]} className="text-xs" />
-              <YAxis type="category" dataKey="name" width={120} className="text-xs" />
-              <Tooltip formatter={(v) => [`${Number(v)}/100`, 'Score']} />
-              <Bar dataKey="score" radius={[0, 4, 4, 0]}>
-                {sorted.map((s, i) => (
-                  <Cell key={i} fill={scoreColor(s.score)} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          {isLoading ? (
+            <Skeleton className="h-[200px] w-full" />
+          ) : (
+            <ResponsiveContainer width="100%" height={Math.max(200, sorted.length * 40)}>
+              <BarChart data={sorted} layout="vertical">
+                <XAxis type="number" domain={[0, 100]} className="text-xs" />
+                <YAxis type="category" dataKey="name" width={120} className="text-xs" />
+                <Tooltip formatter={(v) => [`${Number(v)}/100`, 'Score']} />
+                <Bar dataKey="score" radius={[0, 4, 4, 0]}>
+                  {sorted.map((s: Supplier, i: number) => (
+                    <Cell key={i} fill={scoreColor(s.score)} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </CardContent>
       </Card>
 
@@ -53,22 +65,43 @@ export default function SuppliersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sorted.map(s => (
-              <TableRow key={s.name}>
-                <TableCell className="font-medium">{s.name}</TableCell>
-                <TableCell className="text-muted-foreground">{s.region}</TableCell>
-                <TableCell>
-                  <span className="font-bold" style={{ color: scoreColor(s.score) }}>
-                    {s.score}
-                  </span>
-                  <span className="text-muted-foreground text-xs">/100</span>
-                </TableCell>
-                <TableCell>{s.invoices}</TableCell>
-                <TableCell>{s.flagged}</TableCell>
-                <TableCell>{((s.flagged / s.invoices) * 100).toFixed(0)}%</TableCell>
-                <TableCell>${s.totalSpend.toLocaleString()}</TableCell>
-              </TableRow>
-            ))}
+            {isLoading
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <TableRow key={i}>
+                    {Array.from({ length: 7 }).map((_, j) => (
+                      <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              : sorted.length === 0
+              ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                      No suppliers found
+                    </TableCell>
+                  </TableRow>
+                )
+              : sorted.map((s: Supplier) => (
+                  <TableRow key={s.id}>
+                    <TableCell className="font-medium">{s.name}</TableCell>
+                    <TableCell className="text-muted-foreground">{s.region}</TableCell>
+                    <TableCell>
+                      <span className="font-bold" style={{ color: scoreColor(s.score) }}>
+                        {s.score}
+                      </span>
+                      <span className="text-muted-foreground text-xs">/100</span>
+                    </TableCell>
+                    <TableCell>{s.invoice_count}</TableCell>
+                    <TableCell>{s.flagged_count}</TableCell>
+                    <TableCell>
+                      {s.invoice_count > 0
+                        ? `${((s.flagged_count / s.invoice_count) * 100).toFixed(0)}%`
+                        : '—'}
+                    </TableCell>
+                    <TableCell>${Number(s.total_spend).toLocaleString()}</TableCell>
+                  </TableRow>
+                ))
+            }
           </TableBody>
         </Table>
       </div>

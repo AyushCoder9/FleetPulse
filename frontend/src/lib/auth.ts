@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { api } from './api'
 
 const TOKEN_KEY = 'fleetpulse_token'
+const REFRESH_KEY = 'fleetpulse_refresh'
 const USER_KEY = 'fleetpulse_user'
 
 export function useAuth() {
@@ -20,17 +22,20 @@ export function useAuth() {
     return () => window.removeEventListener('storage', handler)
   }, [])
 
-  function login(email: string, _password: string) {
-    const fakeToken = btoa(`${email}:${Date.now()}`)
-    const fakeUser = { name: email.split('@')[0], org: 'Acme Fleet' }
-    localStorage.setItem(TOKEN_KEY, fakeToken)
-    localStorage.setItem(USER_KEY, JSON.stringify(fakeUser))
-    setToken(fakeToken)
-    setUser(fakeUser)
+  async function login(username: string, password: string): Promise<void> {
+    const { access, refresh } = await api.login(username, password)
+    const payload = JSON.parse(atob(access.split('.')[1])) as { username?: string }
+    const derivedUser = { name: payload.username ?? username, org: 'FleetPulse' }
+    localStorage.setItem(TOKEN_KEY, access)
+    localStorage.setItem(REFRESH_KEY, refresh)
+    localStorage.setItem(USER_KEY, JSON.stringify(derivedUser))
+    setToken(access)
+    setUser(derivedUser)
   }
 
   function logout() {
     localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(REFRESH_KEY)
     localStorage.removeItem(USER_KEY)
     setToken(null)
     setUser(null)

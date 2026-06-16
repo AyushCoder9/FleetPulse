@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/auth'
 import { toast } from 'sonner'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('admin@acmefleet.com')
+  const [username, setUsername] = useState('admin')
   const [password, setPassword] = useState('password')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
@@ -17,11 +17,15 @@ export default function LoginPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setLoading(true)
-    await new Promise(r => setTimeout(r, 600))
-    login(email, password)
-    toast.success('Logged in successfully')
-    navigate('/dashboard')
-    setLoading(false)
+    try {
+      await login(username, password)
+      toast.success('Logged in successfully')
+      navigate('/dashboard')
+    } catch {
+      toast.error('Invalid credentials')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -40,12 +44,12 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
-              <label className="text-sm font-medium" htmlFor="email">Email</label>
+              <label className="text-sm font-medium" htmlFor="username">Username</label>
               <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                id="username"
+                type="text"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
                 required
                 className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
