@@ -5,9 +5,7 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from faker import Faker
 
-fake = Faker()
 User = get_user_model()
 
 SERVICE_TYPES = [
@@ -46,6 +44,9 @@ class Command(BaseCommand):
         parser.add_argument('--force', action='store_true', help='Re-seed even if data exists')
 
     def handle(self, *args, **options):
+        from faker import Faker
+        fake = Faker()
+
         from apps.organizations.models import Organization, Membership
         from apps.vehicles.models import Vehicle
         from apps.telemetry.models import TelemetryEvent
