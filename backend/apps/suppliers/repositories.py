@@ -1,5 +1,6 @@
 from apps.core.repositories import BaseRepository
-from .models import Supplier, ContractRate
+
+from .models import ContractRate, Supplier
 
 
 class SupplierRepository(BaseRepository[Supplier]):

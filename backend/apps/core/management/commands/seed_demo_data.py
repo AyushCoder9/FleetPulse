@@ -47,12 +47,12 @@ class Command(BaseCommand):
         from faker import Faker
         fake = Faker()
 
-        from apps.organizations.models import Organization, Membership
-        from apps.vehicles.models import Vehicle
-        from apps.telemetry.models import TelemetryEvent
-        from apps.suppliers.models import Supplier, ContractRate
-        from apps.invoices.models import Invoice, InvoiceLineItem
         from apps.anomalies.models import AnomalyFlag, IdleEvent
+        from apps.invoices.models import Invoice, InvoiceLineItem
+        from apps.organizations.models import Membership, Organization
+        from apps.suppliers.models import ContractRate, Supplier
+        from apps.telemetry.models import TelemetryEvent
+        from apps.vehicles.models import Vehicle
 
         if Organization.objects.count() > 0 and not options['force']:
             self.stdout.write(self.style.WARNING('Data already exists. Use --force to re-seed.'))

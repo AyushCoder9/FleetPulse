@@ -1,5 +1,6 @@
 from apps.core.repositories import BaseRepository
-from .models import Organization, Membership
+
+from .models import Membership, Organization
 
 
 class OrganizationRepository(BaseRepository[Organization]):

@@ -1,11 +1,12 @@
 from decimal import Decimal
-from django.db.models import Sum, Count, Q
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import permissions
 
-from apps.invoices.models import Invoice
+from django.db.models import Count, Q, Sum
+from rest_framework import permissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from apps.anomalies.models import AnomalyFlag, IdleEvent
+from apps.invoices.models import Invoice
 from apps.suppliers.models import Supplier
 
 

@@ -1,4 +1,5 @@
 from apps.core.repositories import BaseRepository
+
 from .models import AnomalyFlag, IdleEvent
 
 

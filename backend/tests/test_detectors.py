@@ -1,12 +1,13 @@
-from decimal import Decimal
 from dataclasses import dataclass
+from decimal import Decimal
+
 import pytest
 
 from apps.anomalies.detectors import (
-    RateCardVarianceDetector,
-    DuplicateLineItemDetector,
     DetectorRegistry,
+    DuplicateLineItemDetector,
     Flag,
+    RateCardVarianceDetector,
 )
 
 

@@ -1,4 +1,5 @@
-from typing import TypeVar, Generic, Type, Any
+from typing import Any, Generic, Type, TypeVar
+
 from django.db import models
 
 T = TypeVar('T', bound=models.Model)

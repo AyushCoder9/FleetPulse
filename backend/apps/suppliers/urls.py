@@ -1,5 +1,6 @@
 from rest_framework.routers import DefaultRouter
-from .views import SupplierViewSet, ContractRateViewSet
+
+from .views import ContractRateViewSet, SupplierViewSet
 
 router = DefaultRouter()
 router.register('suppliers', SupplierViewSet, basename='supplier')

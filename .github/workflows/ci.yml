@@ -9,29 +9,6 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_DB: fleetpulse_test
-          POSTGRES_USER: fleetpulse
-          POSTGRES_PASSWORD: fleetpulse
-        ports:
-          - '5432:5432'
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      redis:
-        image: redis:7-alpine
-        ports:
-          - '6379:6379'
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
       - uses: actions/checkout@v4
@@ -54,9 +31,7 @@ jobs:
         run: pytest --cov=apps --cov-report=term-missing -v
         working-directory: backend
         env:
-          DJANGO_SETTINGS_MODULE: config.settings.dev
-          DATABASE_URL: postgresql://fleetpulse:fleetpulse@localhost:5432/fleetpulse_test
-          REDIS_URL: redis://localhost:6379/0
+          DJANGO_SETTINGS_MODULE: config.settings.test
           DJANGO_SECRET_KEY: ci-secret-key-not-used-in-prod
 
   frontend:
@@ -76,6 +51,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+        working-directory: frontend
+
+      - name: Type check
+        run: pnpm exec tsc --noEmit
         working-directory: frontend
 
       - name: Build

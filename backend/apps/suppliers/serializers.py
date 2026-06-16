@@ -1,7 +1,9 @@
 from rest_framework import serializers
+
 from apps.anomalies.models import AnomalyFlag
 from apps.invoices.models import Invoice
-from .models import Supplier, ContractRate
+
+from .models import ContractRate, Supplier
 
 
 class SupplierSerializer(serializers.ModelSerializer):

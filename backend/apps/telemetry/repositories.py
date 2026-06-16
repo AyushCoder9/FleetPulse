@@ -1,6 +1,9 @@
-from django.utils import timezone
 from datetime import timedelta
+
+from django.utils import timezone
+
 from apps.core.repositories import BaseRepository
+
 from .models import TelemetryEvent
 
 

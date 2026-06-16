@@ -1,10 +1,11 @@
-from decimal import Decimal
 from dataclasses import dataclass, field
+from decimal import Decimal
 from unittest.mock import MagicMock, patch
+
 import pytest
 
-from apps.invoices.services import InvoiceReconciliationService
 from apps.anomalies.detectors import Flag
+from apps.invoices.services import InvoiceReconciliationService
 
 
 @dataclass

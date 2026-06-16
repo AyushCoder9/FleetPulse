@@ -1,12 +1,18 @@
 import pytest
 from django.urls import reverse
-from rest_framework.test import APIClient
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from tests.factories import (
-    UserFactory, OrganizationFactory, MembershipFactory,
-    VehicleFactory, SupplierFactory, ContractRateFactory,
-    InvoiceFactory, InvoiceLineItemFactory, AnomalyFlagFactory,
+    AnomalyFlagFactory,
+    ContractRateFactory,
+    InvoiceFactory,
+    InvoiceLineItemFactory,
+    MembershipFactory,
+    OrganizationFactory,
+    SupplierFactory,
+    UserFactory,
+    VehicleFactory,
 )
 
 

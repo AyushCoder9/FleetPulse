@@ -1,8 +1,9 @@
-from rest_framework import viewsets, permissions
+from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Supplier, ContractRate
-from .serializers import SupplierSerializer, ContractRateSerializer, SupplierScorecardSerializer
+
+from .models import ContractRate, Supplier
+from .serializers import ContractRateSerializer, SupplierScorecardSerializer, SupplierSerializer
 
 
 class SupplierViewSet(viewsets.ReadOnlyModelViewSet):
