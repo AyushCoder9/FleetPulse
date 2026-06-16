@@ -1,9 +1,5 @@
 <p align="center">
-  <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="64" height="64" rx="14" fill="#0f0f0f"/>
-    <text x="10" y="44" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="30" fill="#f59e0b">FP</text>
-    <polyline points="4,50 16,50 22,38 28,56 34,42 40,50 60,50" stroke="#f59e0b" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
+  <img src="frontend/public/favicon.svg" width="96" alt="FleetPulse logo" />
 </p>
 
 <h1 align="center">FleetPulse</h1>

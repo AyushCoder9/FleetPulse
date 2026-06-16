@@ -1,8 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
-  <!-- F letterform -->
-  <path d="M4 8 L4 32 L8 32 L8 22 L18 22 L18 18 L8 18 L8 12 L20 12 L20 8 Z" fill="#f59e0b"/>
-  <!-- P letterform -->
-  <path d="M22 8 L22 32 L26 32 L26 22 L30 22 C34.4 22 37 19.5 37 15 C37 10.5 34.4 8 30 8 Z M26 12 L30 12 C31.9 12 33 13 33 15 C33 17 31.9 18 30 18 L26 18 Z" fill="#f59e0b"/>
-  <!-- ECG pulse line threading through bottom -->
-  <polyline points="4,36 10,36 12,30 15,38 17,33 20,36 36,36" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Outer badge -->
+  <rect width="200" height="200" rx="42" fill="#0a0a0a"/>
+
+  <!-- Truck body (cargo + cab, side profile) -->
+  <!-- Cargo box -->
+  <rect x="18" y="54" width="98" height="72" rx="7" fill="#f59e0b"/>
+  <!-- Cab section -->
+  <path d="M116 70 L116 126 L158 126 L158 96 L143 70 Z" fill="#f59e0b"/>
+  <!-- Cab window -->
+  <path d="M120 76 L120 108 L152 108 L152 97 L139 76 Z" fill="#0a0a0a" opacity="0.5"/>
+  <!-- Cargo door lines -->
+  <line x1="68" y1="58" x2="68" y2="122" stroke="#0a0a0a" stroke-width="3" opacity="0.35"/>
+  <!-- Front grill -->
+  <rect x="156" y="106" width="6" height="16" rx="2" fill="#0a0a0a" opacity="0.4"/>
+
+  <!-- Wheels -->
+  <circle cx="48" cy="134" r="22" fill="#1a1a1a"/>
+  <circle cx="48" cy="134" r="13" fill="#f59e0b"/>
+  <circle cx="48" cy="134" r="5" fill="#0a0a0a"/>
+  <circle cx="138" cy="134" r="22" fill="#1a1a1a"/>
+  <circle cx="138" cy="134" r="13" fill="#f59e0b"/>
+  <circle cx="138" cy="134" r="5" fill="#0a0a0a"/>
+
+  <!-- ECG pulse line at bottom — the "Pulse" in FleetPulse -->
+  <polyline
+    points="10,172 36,172 48,148 60,188 70,160 82,172 190,172"
+    stroke="#f59e0b"
+    stroke-width="6.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
 </svg>

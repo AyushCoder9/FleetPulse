@@ -607,33 +607,77 @@ function CtaSection() {
 }
 
 function Footer() {
+  const cols = [
+    {
+      heading: 'Product',
+      links: [
+        { label: 'Dashboard', to: '/app/dashboard' },
+        { label: 'Invoices', to: '/app/invoices' },
+        { label: 'Vehicles', to: '/app/vehicles' },
+        { label: 'Suppliers', to: '/app/suppliers' },
+      ],
+    },
+    {
+      heading: 'Features',
+      links: [
+        { label: 'Anomaly Detection', to: '/#features' },
+        { label: 'Invoice Import', to: '/#features' },
+        { label: 'Supplier Scorecards', to: '/#features' },
+        { label: 'Fleet Analytics', to: '/#features' },
+      ],
+    },
+    {
+      heading: 'Account',
+      links: [
+        { label: 'Sign in', to: '/login' },
+        { label: 'Get started', to: '/login' },
+        { label: 'Import invoices', to: '/app/invoices' },
+        { label: 'View fleet', to: '/app/vehicles' },
+      ],
+    },
+  ]
+
   return (
-    <footer className="py-12 px-6 border-t border-border">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div className="flex items-center gap-2.5">
-            <Logo size={24} className="text-primary" />
-            <span className="font-semibold text-foreground" style={{ fontFamily: 'var(--font-display)' }}>FleetPulse</span>
-            <span className="text-muted-foreground text-sm ml-2">Fleet Spend Intelligence</span>
+    <footer className="border-t border-border bg-card/40">
+      <div className="max-w-6xl mx-auto px-6 py-14">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+          {/* Brand */}
+          <div className="col-span-2 md:col-span-1">
+            <Link to="/" className="flex items-center gap-2.5 mb-4">
+              <Logo size={28} className="text-primary" />
+              <span className="font-bold text-foreground" style={{ fontFamily: 'var(--font-display)' }}>FleetPulse</span>
+            </Link>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-[180px]">
+              Fleet spend intelligence. Catch overcharges before they hit your books.
+            </p>
           </div>
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-            <a href="#how-it-works" className="hover:text-foreground transition-colors">How it works</a>
-            <Link to="/login" className="hover:text-foreground transition-colors">Sign in</Link>
-            <a
-              href="https://github.com/AyushCoder9/FleetPulse"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors flex items-center gap-1"
-            >
-              <ExternalLink className="h-4 w-4" />
-              GitHub
-            </a>
-          </div>
+
+          {/* Link columns */}
+          {cols.map(col => (
+            <div key={col.heading}>
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">{col.heading}</p>
+              <ul className="space-y-2.5">
+                {col.links.map(link => (
+                  <li key={link.label}>
+                    <Link
+                      to={link.to}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-muted-foreground">
-          <span>© 2026 FleetPulse. Built by Ayush Kumar Singh.</span>
-          <span>Django + React + Tailwind v4</span>
+
+        <div className="mt-12 pt-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-muted-foreground">
+          <span>© 2026 FleetPulse. All rights reserved.</span>
+          <div className="flex items-center gap-4">
+            <span className="text-muted-foreground/50">Privacy Policy</span>
+            <span className="text-muted-foreground/50">Terms of Service</span>
+          </div>
         </div>
       </div>
     </footer>
