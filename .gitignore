@@ -36,3 +36,7 @@ coverage.xml
 .venv/
 venv/
 env/
+
+# Tool caches / AI artifacts
+.playwright-mcp/
+.claude/

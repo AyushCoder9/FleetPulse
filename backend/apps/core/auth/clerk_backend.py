@@ -4,9 +4,11 @@ Clerk JWT authentication for DRF.
 When CLERK_JWKS_URL and CLERK_ISSUER are set in settings, this class validates
 Clerk session JWTs and auto-creates Django users + organizations on first login.
 
-If those env vars are absent, this class returns None so DRF falls through to
-the next authentication class (SimpleJWT — the existing fallback).
+If those env vars are absent, or the token is HS256 (SimpleJWT), this class
+returns None so DRF falls through to the next authentication class (SimpleJWT).
 """
+import base64
+import json
 import logging
 import time
 from typing import Optional, Tuple
@@ -109,6 +111,17 @@ def _get_or_create_user_from_clerk(payload: dict):
     return user
 
 
+def _is_rs256(token: str) -> bool:
+    """Return True if the JWT header declares RS256 (Clerk tokens). False for HS256 (SimpleJWT)."""
+    try:
+        header_b64 = token.split('.')[0]
+        header_b64 += '=' * (-len(header_b64) % 4)
+        header = json.loads(base64.urlsafe_b64decode(header_b64))
+        return header.get('alg', '') == 'RS256'
+    except Exception:
+        return False
+
+
 class ClerkJWTAuthentication(BaseAuthentication):
     """
     DRF authentication class that validates Clerk session tokens.
@@ -132,8 +145,12 @@ class ClerkJWTAuthentication(BaseAuthentication):
             return None
 
         token = auth_header[7:]
-
         if not token:
+            return None
+
+        # Only attempt Clerk verification for RS256 tokens (Clerk uses asymmetric keys).
+        # SimpleJWT tokens are HS256 — return None so SimpleJWT can handle them.
+        if not _is_rs256(token):
             return None
 
         payload = _verify_clerk_jwt(token)

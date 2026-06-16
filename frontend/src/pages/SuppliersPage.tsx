@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
@@ -7,9 +6,18 @@ import { api } from '@/lib/api'
 import type { Supplier } from '@/lib/api'
 
 function scoreColor(score: number) {
-  if (score >= 85) return 'hsl(142, 71%, 45%)'
-  if (score >= 65) return 'hsl(38, 92%, 50%)'
-  return 'hsl(0, 84%, 60%)'
+  if (score >= 85) return 'oklch(0.697 0.170 162.5)'
+  if (score >= 65) return 'oklch(0.828 0.189 84.4)'
+  return 'oklch(0.628 0.24 27.3)'
+}
+
+function ScoreBadge({ score }: { score: number }) {
+  const color = scoreColor(score)
+  return (
+    <span className="font-data font-bold text-sm" style={{ color }}>
+      {score}<span className="text-muted-foreground text-xs font-normal">/100</span>
+    </span>
+  )
 }
 
 export default function SuppliersPage() {
@@ -21,53 +29,66 @@ export default function SuppliersPage() {
   const sorted = [...suppliers].sort((a: Supplier, b: Supplier) => b.score - a.score)
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-5 max-w-[1400px] mx-auto">
       <div>
-        <h1 className="text-2xl font-bold">Supplier Scorecard</h1>
-        <p className="text-muted-foreground text-sm">Compliance and quality ranking</p>
+        <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+          Supplier Scorecard
+        </h1>
+        <p className="text-muted-foreground text-sm mt-0.5">Compliance and quality ranking by flagged-invoice ratio</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm">Score Ranking</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <Skeleton className="h-[200px] w-full" />
-          ) : (
-            <ResponsiveContainer width="100%" height={Math.max(200, sorted.length * 40)}>
-              <BarChart data={sorted} layout="vertical">
-                <XAxis type="number" domain={[0, 100]} className="text-xs" />
-                <YAxis type="category" dataKey="name" width={120} className="text-xs" />
-                <Tooltip formatter={(v) => [`${Number(v)}/100`, 'Score']} />
-                <Bar dataKey="score" radius={[0, 4, 4, 0]}>
-                  {sorted.map((s: Supplier, i: number) => (
-                    <Cell key={i} fill={scoreColor(s.score)} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </CardContent>
-      </Card>
+      <div className="border border-border rounded-xl bg-card p-4">
+        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Score Ranking</p>
+        {isLoading ? (
+          <Skeleton className="h-[200px] w-full" />
+        ) : sorted.length === 0 ? (
+          <p className="text-muted-foreground text-sm text-center py-8">No suppliers found</p>
+        ) : (
+          <ResponsiveContainer width="100%" height={Math.max(200, sorted.length * 44)}>
+            <BarChart data={sorted} layout="vertical" margin={{ left: 8, right: 24, top: 4, bottom: 4 }}>
+              <XAxis
+                type="number"
+                domain={[0, 100]}
+                tick={{ fontSize: 11, fill: 'oklch(0.40 0 0)' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                type="category"
+                dataKey="name"
+                width={130}
+                tick={{ fontSize: 12, fill: 'oklch(0.91 0 0)' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                contentStyle={{ background: 'oklch(0.08 0 0)', border: '1px solid oklch(0.17 0 0)', borderRadius: 8 }}
+                labelStyle={{ color: 'oklch(0.91 0 0)', fontSize: 12 }}
+                formatter={(v) => [`${Number(v)}/100`, 'Score']}
+              />
+              <Bar dataKey="score" radius={[0, 6, 6, 0]}>
+                {sorted.map((s: Supplier, i: number) => (
+                  <Cell key={i} fill={scoreColor(s.score)} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </div>
 
-      <div className="border rounded-lg overflow-hidden">
+      <div className="border border-border rounded-xl overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Supplier</TableHead>
-              <TableHead>Region</TableHead>
-              <TableHead>Score</TableHead>
-              <TableHead>Invoices</TableHead>
-              <TableHead>Flagged</TableHead>
-              <TableHead>Flag Rate</TableHead>
-              <TableHead>Total Spend</TableHead>
+            <TableRow className="border-border hover:bg-transparent">
+              {['Supplier', 'Region', 'Score', 'Invoices', 'Flagged', 'Flag Rate', 'Total Spend'].map(h => (
+                <TableHead key={h} className="text-xs uppercase tracking-wider text-muted-foreground">{h}</TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading
               ? Array.from({ length: 4 }).map((_, i) => (
-                  <TableRow key={i}>
+                  <TableRow key={i} className="border-border">
                     {Array.from({ length: 7 }).map((_, j) => (
                       <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                     ))}
@@ -76,29 +97,22 @@ export default function SuppliersPage() {
               : sorted.length === 0
               ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-12">
                       No suppliers found
                     </TableCell>
                   </TableRow>
                 )
               : sorted.map((s: Supplier) => (
-                  <TableRow key={s.id}>
+                  <TableRow key={s.id} className="border-border hover:bg-secondary/30 transition-colors">
                     <TableCell className="font-medium">{s.name}</TableCell>
-                    <TableCell className="text-muted-foreground">{s.region}</TableCell>
-                    <TableCell>
-                      <span className="font-bold" style={{ color: scoreColor(s.score) }}>
-                        {s.score}
-                      </span>
-                      <span className="text-muted-foreground text-xs">/100</span>
+                    <TableCell className="text-muted-foreground text-sm">{s.region}</TableCell>
+                    <TableCell><ScoreBadge score={s.score} /></TableCell>
+                    <TableCell className="font-data text-sm">{s.invoice_count}</TableCell>
+                    <TableCell className="font-data text-sm text-red-400">{s.flagged_count}</TableCell>
+                    <TableCell className="font-data text-sm">
+                      {s.invoice_count > 0 ? `${((s.flagged_count / s.invoice_count) * 100).toFixed(0)}%` : '—'}
                     </TableCell>
-                    <TableCell>{s.invoice_count}</TableCell>
-                    <TableCell>{s.flagged_count}</TableCell>
-                    <TableCell>
-                      {s.invoice_count > 0
-                        ? `${((s.flagged_count / s.invoice_count) * 100).toFixed(0)}%`
-                        : '—'}
-                    </TableCell>
-                    <TableCell>${Number(s.total_spend).toLocaleString()}</TableCell>
+                    <TableCell className="font-data text-sm text-primary">${Number(s.total_spend).toLocaleString()}</TableCell>
                   </TableRow>
                 ))
             }

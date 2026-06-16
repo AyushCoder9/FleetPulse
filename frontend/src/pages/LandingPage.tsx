@@ -4,7 +4,7 @@ import { motion, useInView } from 'framer-motion'
 import {
   AlertTriangle, TrendingDown, Clock, Upload,
   BarChart2, Award, ChevronDown, ArrowRight,
-  Github, Zap, CheckCircle, Shield, FileText,
+  ExternalLink, Truck, Zap, CheckCircle, Shield, FileText,
 } from 'lucide-react'
 import Logo from '@/components/Logo'
 
@@ -626,7 +626,7 @@ function Footer() {
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors flex items-center gap-1"
             >
-              <Github className="h-4 w-4" />
+              <ExternalLink className="h-4 w-4" />
               GitHub
             </a>
           </div>

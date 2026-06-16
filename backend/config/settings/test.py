@@ -15,3 +15,7 @@ DATABASES = {
 }
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
+
+# Disable Clerk in tests — all test auth goes through SimpleJWT
+CLERK_JWKS_URL = ''
+CLERK_ISSUER = ''
