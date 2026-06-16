@@ -4,7 +4,7 @@ import { motion, useInView } from 'framer-motion'
 import {
   AlertTriangle, TrendingDown, Clock, Upload,
   BarChart2, Award, ChevronDown, ArrowRight,
-  ExternalLink, Truck, Zap, CheckCircle, Shield, FileText,
+  Truck, Zap, CheckCircle, Shield, FileText,
 } from 'lucide-react'
 import Logo from '@/components/Logo'
 
