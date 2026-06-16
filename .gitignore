@@ -40,3 +40,4 @@ env/
 # Tool caches / AI artifacts
 .playwright-mcp/
 .claude/
+.vercel
