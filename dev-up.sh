@@ -33,10 +33,12 @@ VENV="$REPO_ROOT/backend/.venv"
 if [[ ! -d "$VENV" ]]; then
   yellow "No venv found — creating $VENV"
   python3 -m venv "$VENV"
+  source "$VENV/bin/activate"
+  pip install -q -r "$REPO_ROOT/backend/requirements.txt"
+else
+  source "$VENV/bin/activate"
+  yellow "Venv exists — skipping pip install (run: pip install -r backend/requirements.txt manually if deps changed)"
 fi
-
-source "$VENV/bin/activate"
-pip install -q -r "$REPO_ROOT/backend/requirements.txt"
 
 cd "$REPO_ROOT/backend"
 python manage.py migrate --settings=config.settings.dev --run-syncdb 2>/dev/null || \
