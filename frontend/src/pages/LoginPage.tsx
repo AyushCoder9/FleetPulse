@@ -8,8 +8,8 @@ import { useAuth } from '@/lib/auth'
 import { toast } from 'sonner'
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('admin')
-  const [password, setPassword] = useState('password')
+  const [username, setUsername] = useState(import.meta.env.VITE_DEMO_USERNAME ?? 'admin')
+  const [password, setPassword] = useState(import.meta.env.VITE_DEMO_PASSWORD ?? 'password')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
