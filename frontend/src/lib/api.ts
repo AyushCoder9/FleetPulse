@@ -66,6 +66,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json()
 }
 
+interface Paginated<T> { count: number; results: T[] }
+
 export const api = {
   login: (username: string, password: string) =>
     request<{ access: string; refresh: string }>('/api/v1/auth/token/', {
@@ -75,8 +77,10 @@ export const api = {
 
   dashboard: () => request<DashboardSummary>('/api/v1/dashboard/summary/'),
 
-  invoices: (status?: string) =>
-    request<Invoice[]>(`/api/v1/invoices/${status ? `?status=${status}` : ''}`),
+  invoices: async (status?: string): Promise<Invoice[]> => {
+    const res = await request<Paginated<Invoice>>(`/api/v1/invoices/${status ? `?status=${status}` : ''}`)
+    return res.results
+  },
 
   approveInvoice: (id: number) =>
     request<void>(`/api/v1/invoices/${id}/approve/`, { method: 'POST' }),
@@ -84,12 +88,15 @@ export const api = {
   flagInvoice: (id: number) =>
     request<void>(`/api/v1/invoices/${id}/flag/`, { method: 'POST' }),
 
-  vehicles: () => request<Vehicle[]>('/api/v1/vehicles/'),
+  vehicles: async (): Promise<Vehicle[]> => {
+    const res = await request<Paginated<Vehicle>>('/api/v1/vehicles/')
+    return res.results
+  },
 
   suppliers: async (): Promise<Supplier[]> => {
-    const list = await request<{ id: number; name: string; region: string }[]>('/api/v1/suppliers/')
+    const res = await request<Paginated<{ id: number; name: string; region: string }>>('/api/v1/suppliers/')
     const scorecards = await Promise.all(
-      list.map(s => request<Supplier>(`/api/v1/suppliers/${s.id}/scorecard/`))
+      res.results.map(s => request<Supplier>(`/api/v1/suppliers/${s.id}/scorecard/`))
     )
     return scorecards
   },
