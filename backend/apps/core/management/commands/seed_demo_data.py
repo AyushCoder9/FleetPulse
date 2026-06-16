@@ -88,6 +88,11 @@ class Command(BaseCommand):
                 )
                 Membership.objects.create(user=user, organization=org, role='admin')
 
+        # Link existing superuser (admin) to first org so API queries return data
+        superuser = User.objects.filter(username='admin').first()
+        if superuser and not Membership.objects.filter(user=superuser).exists():
+            Membership.objects.create(user=superuser, organization=orgs[0], role='admin')
+
         self.stdout.write('Seeding suppliers...')
         supplier_data = [
             ('AutoCare Pro', 'Southeast'),
