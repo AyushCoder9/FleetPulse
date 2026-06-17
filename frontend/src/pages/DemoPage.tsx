@@ -4,56 +4,23 @@ import {
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   PieChart, Pie, Cell,
 } from 'recharts'
-import { DollarSign, AlertTriangle, Truck, TrendingUp, Activity, ChevronRight, ArrowRight, Zap } from 'lucide-react'
+import { DollarSign, AlertTriangle, Truck, TrendingUp, Activity, ChevronRight, ArrowRight } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import Logo from '@/components/Logo'
+import {
+  DEMO_SUPPLIERS,
+  MONTHLY_STATS,
+  FLEET_STATUS,
+  OVERCHARGES_CAUGHT,
+  IDLE_COST_SAVED,
+  FLAGGED_PENDING,
+  AVG_SUPPLIER_SCORE,
+} from '@/lib/demo-data'
 
-/* ── Colour palette (matches real dashboard) ──────────────────────────── */
 const AMBER   = '#f59e0b'
 const EMERALD = '#10b981'
 const RED     = '#ef4444'
 const ZINC    = '#52525b'
 const PIE_COLORS = [EMERALD, AMBER, RED]
-
-/* ── Demo dataset — all numbers derived from the tables below ─────────── */
-
-const SUPPLIERS = [
-  { name: 'QuickFix Garage',    total: 48, flagged: 2  },
-  { name: 'AutoCare Pro',       total: 65, flagged: 8  },
-  { name: 'MechPro Services',   total: 72, flagged: 14 },
-  { name: 'FleetServ Inc',      total: 43, flagged: 9  },
-  { name: 'Bridgestone Fleet',  total: 31, flagged: 11 },
-].map(s => ({
-  ...s,
-  score: Math.round((1 - s.flagged / s.total) * 100),
-}))
-
-// avg supplier score: (96+88+81+79+65)/5 = 82
-const AVG_SUPPLIER_SCORE = Math.round(
-  SUPPLIERS.reduce((sum, s) => sum + s.score, 0) / SUPPLIERS.length,
-)
-
-const MONTHLY_STATS = [
-  { month: 'Jan', total_spend: 12400, invoice_count: 45, flagged_count: 6  },
-  { month: 'Feb', total_spend: 14800, invoice_count: 52, flagged_count: 8  },
-  { month: 'Mar', total_spend: 13200, invoice_count: 48, flagged_count: 5  },
-  { month: 'Apr', total_spend: 17600, invoice_count: 61, flagged_count: 11 },
-  { month: 'May', total_spend: 15900, invoice_count: 55, flagged_count: 7  },
-  { month: 'Jun', total_spend: 10800, invoice_count: 38, flagged_count: 4  },
-]
-
-// Overcharges caught = estimated overcharge amount on flagged invoices
-const OVERCHARGES_CAUGHT = 8240
-// Idle cost saved = sum of idle event estimated costs
-const IDLE_COST_SAVED    = 3180
-// Pending flagged invoices awaiting review
-const FLAGGED_PENDING    = 7
-
-const FLEET_STATUS = [
-  { name: 'Active',      value: 73 },
-  { name: 'Idle',        value: 18 },
-  { name: 'Maintenance', value: 9  },
-]
 
 const RECENT_ALERTS = [
   { id: 1, service_type: 'Oil Change',          supplier_name: 'QuickFix Garage',   total_amount: 420,  severity: 'high'   },
@@ -63,9 +30,7 @@ const RECENT_ALERTS = [
   { id: 5, service_type: 'AC Repair',            supplier_name: 'Bridgestone Fleet', total_amount: 650,  severity: 'high'   },
 ]
 
-const TOP_SUPPLIERS = [...SUPPLIERS].sort((a, b) => b.score - a.score).slice(0, 4)
-
-/* ── Helpers ──────────────────────────────────────────────────────────── */
+const TOP_SUPPLIERS = [...DEMO_SUPPLIERS].sort((a, b) => b.score - a.score).slice(0, 4)
 
 function fmtCurrency(n: number) {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`
@@ -108,248 +73,200 @@ function KpiCard({
   )
 }
 
-/* ── Page ─────────────────────────────────────────────────────────────── */
-
 export default function DemoPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Demo header */}
-      <header className="sticky top-0 z-50 h-14 border-b border-border bg-background/95 backdrop-blur-sm">
-        <div className="max-w-[1400px] mx-auto flex items-center h-full px-6 gap-4">
-          <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <Logo size={26} className="text-primary" />
-            <span className="text-lg font-semibold text-foreground" style={{ fontFamily: 'var(--font-display)' }}>
-              FleetPulse
-            </span>
-          </Link>
-          <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-3 py-1 rounded-full">
-            <Zap className="h-3 w-3" />
-            Demo Mode
-          </span>
-          <div className="ml-auto flex items-center gap-3">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline">
-              Back to home
+    <div className="space-y-6">
+      {/* Page header */}
+      <div className="flex items-end justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+            Command Center
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Fleet spend & operations at a glance</p>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Activity className="h-3.5 w-3.5 text-primary" />
+          <span>Demo data</span>
+        </div>
+      </div>
+
+      {/* KPI Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard
+          label="Overcharges Caught"
+          value={fmtCurrency(OVERCHARGES_CAUGHT)}
+          sub="From flagged invoices"
+          icon={DollarSign}
+          accent
+        />
+        <KpiCard
+          label="Idle Cost Saved"
+          value={fmtCurrency(IDLE_COST_SAVED)}
+          sub="Via idle event tracking"
+          icon={Truck}
+        />
+        <KpiCard
+          label="Flagged Invoices"
+          value={String(FLAGGED_PENDING)}
+          sub="Awaiting review"
+          icon={AlertTriangle}
+        />
+        <KpiCard
+          label="Avg Supplier Score"
+          value={`${AVG_SUPPLIER_SCORE}/100`}
+          sub="Across all suppliers"
+          icon={TrendingUp}
+        />
+      </div>
+
+      {/* Middle row: spend chart + recent alerts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="lg:col-span-2 border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              Monthly Invoice Spend
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={MONTHLY_STATS} barSize={24}>
+                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.17 0 0)" vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: ZINC }} axisLine={false} tickLine={false} />
+                <YAxis tickFormatter={v => `$${v / 1000}k`} tick={{ fontSize: 11, fill: ZINC }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ background: '#0f0f0f', border: '1px solid #262626', borderRadius: 6, fontSize: 12 }}
+                  formatter={(v) => [`$${Number(v).toLocaleString()}`, 'Total spend']}
+                  cursor={{ fill: 'oklch(0.17 0 0)' }}
+                />
+                <Bar dataKey="total_spend" fill={AMBER} radius={[3, 3, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              Recent Alerts
+            </CardTitle>
+            <Link to="/login" className="text-xs text-primary hover:text-primary/80 flex items-center gap-1">
+              Sign up <ChevronRight className="h-3 w-3" />
             </Link>
-            <Link
-              to="/login"
-              className="text-sm font-semibold bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-all"
-            >
-              Sign up free →
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
-        {/* Demo banner */}
-        <div className="rounded-xl border border-primary/20 bg-primary/5 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
-          <div>
-            <p className="text-sm font-semibold text-foreground">You're viewing demo data</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              All numbers are illustrative but calculated from a realistic 100-vehicle fleet dataset.
-              Sign up to connect your real invoices.
-            </p>
-          </div>
-          <Link
-            to="/login"
-            className="shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
-          >
-            Start with your data <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-
-        {/* Page header */}
-        <div className="flex items-end justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-              Command Center
-            </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">Fleet spend & operations at a glance</p>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Activity className="h-3.5 w-3.5 text-primary" />
-            <span>Demo data</span>
-          </div>
-        </div>
-
-        {/* KPI Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <KpiCard
-            label="Overcharges Caught"
-            value={fmtCurrency(OVERCHARGES_CAUGHT)}
-            sub="From flagged invoices"
-            icon={DollarSign}
-            accent
-          />
-          <KpiCard
-            label="Idle Cost Saved"
-            value={fmtCurrency(IDLE_COST_SAVED)}
-            sub="Via idle event tracking"
-            icon={Truck}
-          />
-          <KpiCard
-            label="Flagged Invoices"
-            value={String(FLAGGED_PENDING)}
-            sub="Awaiting review"
-            icon={AlertTriangle}
-          />
-          <KpiCard
-            label="Avg Supplier Score"
-            value={`${AVG_SUPPLIER_SCORE}/100`}
-            sub="Across all suppliers"
-            icon={TrendingUp}
-          />
-        </div>
-
-        {/* Middle row: spend chart + recent alerts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Card className="lg:col-span-2 border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                Monthly Invoice Spend
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={MONTHLY_STATS} barSize={24}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.17 0 0)" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: ZINC }} axisLine={false} tickLine={false} />
-                  <YAxis tickFormatter={v => `$${v / 1000}k`} tick={{ fontSize: 11, fill: ZINC }} axisLine={false} tickLine={false} />
-                  <Tooltip
-                    contentStyle={{ background: '#0f0f0f', border: '1px solid #262626', borderRadius: 6, fontSize: 12 }}
-                    formatter={(v) => [`$${Number(v).toLocaleString()}`, 'Total spend']}
-                    cursor={{ fill: 'oklch(0.17 0 0)' }}
-                  />
-                  <Bar dataKey="total_spend" fill={AMBER} radius={[3, 3, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                Recent Alerts
-              </CardTitle>
-              <Link to="/login" className="text-xs text-primary hover:text-primary/80 flex items-center gap-1">
-                Sign up <ChevronRight className="h-3 w-3" />
-              </Link>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2.5">
-                {RECENT_ALERTS.map(inv => (
-                  <div key={inv.id} className="flex items-start justify-between gap-2 py-2 border-b border-border last:border-0">
-                    <div className="min-w-0">
-                      <p className="text-xs font-medium text-foreground truncate">{inv.service_type}</p>
-                      <p className="text-[11px] text-muted-foreground truncate mt-0.5">{inv.supplier_name}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <span className="text-xs font-data text-foreground">${inv.total_amount.toLocaleString()}</span>
-                      <SeverityBadge level={inv.severity} />
-                    </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2.5">
+              {RECENT_ALERTS.map(inv => (
+                <div key={inv.id} className="flex items-start justify-between gap-2 py-2 border-b border-border last:border-0">
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-foreground truncate">{inv.service_type}</p>
+                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">{inv.supplier_name}</p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Bottom row: flagged trend + fleet status + supplier scores */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Card className="border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                Flagged Invoice Trend
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={160}>
-                <LineChart data={MONTHLY_STATS}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.17 0 0)" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: ZINC }} axisLine={false} tickLine={false} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: ZINC }} axisLine={false} tickLine={false} />
-                  <Tooltip
-                    contentStyle={{ background: '#0f0f0f', border: '1px solid #262626', borderRadius: 6, fontSize: 12 }}
-                    formatter={(v) => [v, 'Flagged']}
-                  />
-                  <Line type="monotone" dataKey="flagged_count" stroke={AMBER} strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border flex flex-col">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                Fleet Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center gap-4">
-              <ResponsiveContainer width={120} height={120}>
-                <PieChart>
-                  <Pie data={FLEET_STATUS} cx="50%" cy="50%" innerRadius={36} outerRadius={52} dataKey="value" strokeWidth={0}>
-                    {FLEET_STATUS.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="space-y-2">
-                {FLEET_STATUS.map((item, i) => (
-                  <div key={item.name} className="flex items-center gap-2">
-                    <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
-                    <span className="text-xs text-muted-foreground">{item.name}</span>
-                    <span className="text-xs font-data text-foreground ml-auto">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                Supplier Scores
-              </CardTitle>
-              <Link to="/login" className="text-xs text-primary hover:text-primary/80 flex items-center gap-1">
-                Sign up <ChevronRight className="h-3 w-3" />
-              </Link>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {TOP_SUPPLIERS.map(({ name, score }) => (
-                <div key={name}>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-foreground truncate pr-2">{name}</span>
-                    <span className="font-data text-muted-foreground shrink-0">{score}</span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all"
-                      style={{
-                        width: `${score}%`,
-                        background: score >= 80 ? EMERALD : score >= 60 ? AMBER : RED,
-                      }}
-                    />
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className="text-xs font-data text-foreground">${inv.total_amount.toLocaleString()}</span>
+                    <SeverityBadge level={inv.severity} />
                   </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* Sign-up CTA */}
-        <div className="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-8 text-center">
-          <h3 className="text-lg font-bold text-foreground mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-            Ready to run this on your own fleet?
-          </h3>
-          <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
-            Import your CSV, Excel, or JSON invoices — anomaly detectors flag issues within seconds.
-          </p>
-          <Link
-            to="/login"
-            className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-all"
-          >
-            Get started — free <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
+      {/* Bottom row: flagged trend + fleet status + supplier scores */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              Flagged Invoice Trend
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={MONTHLY_STATS}>
+                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.17 0 0)" vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: ZINC }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: ZINC }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ background: '#0f0f0f', border: '1px solid #262626', borderRadius: 6, fontSize: 12 }}
+                  formatter={(v) => [v, 'Flagged']}
+                />
+                <Line type="monotone" dataKey="flagged_count" stroke={AMBER} strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border flex flex-col">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              Fleet Status
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex items-center gap-4">
+            <ResponsiveContainer width={120} height={120}>
+              <PieChart>
+                <Pie data={FLEET_STATUS} cx="50%" cy="50%" innerRadius={36} outerRadius={52} dataKey="value" strokeWidth={0}>
+                  {FLEET_STATUS.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="space-y-2">
+              {FLEET_STATUS.map((item, i) => (
+                <div key={item.name} className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
+                  <span className="text-xs text-muted-foreground">{item.name}</span>
+                  <span className="text-xs font-data text-foreground ml-auto">{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              Supplier Scores
+            </CardTitle>
+            <Link to="/demo/suppliers" className="text-xs text-primary hover:text-primary/80 flex items-center gap-1">
+              View all <ChevronRight className="h-3 w-3" />
+            </Link>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {TOP_SUPPLIERS.map(({ name, score }) => (
+              <div key={name}>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-foreground truncate pr-2">{name}</span>
+                  <span className="font-data text-muted-foreground shrink-0">{score}</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{
+                      width: `${score}%`,
+                      background: score >= 80 ? EMERALD : score >= 60 ? AMBER : RED,
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Sign-up CTA */}
+      <div className="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-8 text-center">
+        <h3 className="text-lg font-bold text-foreground mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+          Ready to run this on your own fleet?
+        </h3>
+        <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+          Import your CSV, Excel, or JSON invoices — anomaly detectors flag issues within seconds.
+        </p>
+        <Link
+          to="/login"
+          className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-all"
+        >
+          Get started — free <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
     </div>
   )

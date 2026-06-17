@@ -2,6 +2,10 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from '@/pages/LandingPage'
 import LoginPage from '@/pages/LoginPage'
 import DemoPage from '@/pages/DemoPage'
+import DemoInvoicesPage from '@/pages/DemoInvoicesPage'
+import DemoVehiclesPage from '@/pages/DemoVehiclesPage'
+import DemoSuppliersPage from '@/pages/DemoSuppliersPage'
+import DemoLayout from '@/components/DemoLayout'
 import DashboardPage from '@/pages/DashboardPage'
 import InvoicesPage from '@/pages/InvoicesPage'
 import VehiclesPage from '@/pages/VehiclesPage'
@@ -20,7 +24,14 @@ export default function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/demo" element={<DemoPage />} />
+
+      {/* Demo — public, nested under shared DemoLayout */}
+      <Route path="/demo" element={<DemoLayout />}>
+        <Route index element={<DemoPage />} />
+        <Route path="invoices" element={<DemoInvoicesPage />} />
+        <Route path="vehicles" element={<DemoVehiclesPage />} />
+        <Route path="suppliers" element={<DemoSuppliersPage />} />
+      </Route>
 
       <Route
         path="/app"
