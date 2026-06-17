@@ -41,3 +41,8 @@ env/
 .playwright-mcp/
 .claude/
 .vercel
+
+# Debug / temp screenshots
+*.png
+*.jpg
+*.jpeg

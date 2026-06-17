@@ -427,9 +427,17 @@ function DemoPreview() {
         </FadeUp>
 
         <FadeUp delay={0.2}>
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            Average flag rate: <span className="text-primary font-data font-semibold">14%</span> of invoices across FleetPulse customers
-          </p>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to="/demo"
+              className="inline-flex items-center gap-2 border border-border text-foreground font-medium px-6 py-3 rounded-xl text-sm hover:bg-secondary transition-colors"
+            >
+              Try live demo <ArrowRight className="h-4 w-4" />
+            </Link>
+            <p className="text-sm text-muted-foreground">
+              Average flag rate: <span className="text-primary font-data font-semibold">14%</span> of invoices across FleetPulse customers
+            </p>
+          </div>
         </FadeUp>
       </div>
     </section>
