@@ -230,39 +230,12 @@ function Hero({ isSignedIn }: { isSignedIn: boolean }) {
             {isSignedIn ? 'Go to dashboard' : 'Start free — no credit card'}
             <ArrowRight className="h-4 w-4" />
           </Link>
-        </motion.div>
-
-        {/* Video demo */}
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 1.05, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-14 w-full max-w-3xl mx-auto"
-        >
-          <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl shadow-black/50 bg-card">
-            {/* browser chrome */}
-            <div className="flex items-center gap-2 px-4 py-2.5 bg-secondary border-b border-border">
-              <div className="flex gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
-                <span className="h-2.5 w-2.5 rounded-full bg-amber-500/60" />
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/60" />
-              </div>
-              <div className="flex-1 mx-3 bg-background/60 rounded px-3 py-0.5 text-[11px] text-muted-foreground text-center">
-                fleetpulse.app/app/dashboard
-              </div>
-            </div>
-            {/* video — replace src with your YouTube embed or video URL */}
-            <div className="relative aspect-video bg-background">
-              <iframe
-                className="absolute inset-0 w-full h-full"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1"
-                title="FleetPulse product demo"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-          </div>
-          <p className="text-center text-xs text-muted-foreground mt-3">2-min product walkthrough</p>
+          <Link
+            to="/demo"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-border text-foreground font-medium px-8 py-3.5 rounded-xl text-base hover:bg-secondary transition-colors"
+          >
+            View demo
+          </Link>
         </motion.div>
 
         <motion.p
