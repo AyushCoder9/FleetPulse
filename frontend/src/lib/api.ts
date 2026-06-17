@@ -53,6 +53,13 @@ export interface SpendTrendItem {
   total: string
 }
 
+export interface MonthlyStatItem {
+  month: string
+  total_spend: number
+  invoice_count: number
+  flagged_count: number
+}
+
 export interface FleetHealth {
   status_counts: Record<string, number>
   idle_cost_total: string
@@ -72,14 +79,18 @@ async function getToken(): Promise<string | null> {
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const token = await getToken()
+  if (!token) throw new Error('No auth token — session may have expired, please sign in again')
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      Authorization: `Bearer ${token}`,
     },
     ...options,
   })
-  if (res.status === 401) throw new Error('Unauthorized')
+  if (res.status === 401) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.detail ?? 'Unauthorized')
+  }
   if (!res.ok) throw new Error(`API error ${res.status}`)
   if (res.status === 204) return undefined as T
   return res.json()
@@ -116,8 +127,16 @@ export const api = {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: formData,
     })
-    if (res.status === 401) throw new Error('Unauthorized')
-    if (!res.ok) throw new Error(`API error ${res.status}`)
+    if (!token) throw new Error('No auth token — session may have expired, please sign in again')
+    if (res.status === 401) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body.detail ?? 'Not authenticated — please sign in again')
+    }
+    if (!res.ok) {
+      let msg = `Server error ${res.status}`
+      try { const body = await res.json(); msg = body.error ?? body.detail ?? msg } catch {}
+      throw new Error(msg)
+    }
     return res.json()
   },
 
@@ -134,7 +153,12 @@ export const api = {
     return scorecards
   },
 
+  deleteInvoice: (id: number) =>
+    request<void>(`/api/v1/invoices/${id}/soft_delete/`, { method: 'DELETE' }),
+
   spendTrend: () => request<SpendTrendItem[]>('/api/v1/analytics/spend-trend/'),
 
   fleetHealth: () => request<FleetHealth>('/api/v1/analytics/fleet-health/'),
+
+  monthlyStats: () => request<MonthlyStatItem[]>('/api/v1/analytics/monthly-stats/'),
 }

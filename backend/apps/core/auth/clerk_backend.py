@@ -67,10 +67,14 @@ def _verify_clerk_jwt(token: str) -> dict:
             signing_key.key,
             algorithms=['RS256'],
             issuer=issuer,
-            options={'require': ['exp', 'iat', 'sub']},
+            options={
+                'require': ['exp', 'iat', 'sub'],
+                'verify_aud': False,
+            },
         )
         return payload
     except Exception as e:
+        logger.error('Clerk JWT verification failed: %s', e)
         raise AuthenticationFailed(f'Invalid Clerk token: {e}')
 
 

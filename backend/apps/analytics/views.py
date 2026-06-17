@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.db.models import Count, Q, Sum
 from django.db.models.functions import TruncMonth
+from rest_framework import permissions
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -80,3 +81,45 @@ class FleetHealthView(APIView):
             'status_counts': {row['status']: row['count'] for row in status_counts},
             'idle_cost_total': str(idle_cost),
         })
+
+
+class MonthlyStatsView(APIView):
+    """
+    GET /api/v1/analytics/monthly-stats/
+    Returns per-month totals for the last 6 months:
+    [{month: "Jan", total_spend: 4200.00, flagged_count: 2, invoice_count: 8}, ...]
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        from apps.invoices.models import Invoice
+
+        org = _get_user_org(request.user)
+        if org is None:
+            return Response([])
+
+        since = date.today() - timedelta(days=180)
+
+        rows = (
+            Invoice.objects
+            .filter(organization=org, is_deleted=False, created_at__date__gte=since)
+            .annotate(month=TruncMonth('created_at'))
+            .values('month')
+            .annotate(
+                total_spend=Sum('total_amount'),
+                invoice_count=Count('id'),
+                flagged_count=Count('id', filter=Q(status='flagged')),
+            )
+            .order_by('month')
+        )
+
+        data = [
+            {
+                'month': r['month'].strftime('%b'),
+                'total_spend': float(r['total_spend'] or 0),
+                'invoice_count': r['invoice_count'],
+                'flagged_count': r['flagged_count'],
+            }
+            for r in rows
+        ]
+        return Response(data)

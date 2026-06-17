@@ -21,19 +21,26 @@ export function ImportModal({
   const [dragging, setDragging] = useState(false)
   const [result, setResult] = useState<ImportResult | null>(null)
 
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+
   const importMutation = useMutation({
     mutationFn: (file: File) => api.importInvoices(file),
     onSuccess: (data) => {
+      setErrorMsg(null)
       setResult(data)
       onDone()
       if (data.created > 0) toast.success(`Imported ${data.created} invoices`)
-      if (data.skipped > 0) toast.error(`${data.skipped} rows skipped`)
+      if (data.skipped > 0) toast.message(`${data.skipped} rows skipped`)
     },
-    onError: () => toast.error('Import failed'),
+    onError: (err: Error) => {
+      setErrorMsg(err.message || 'Import failed')
+      toast.error(err.message || 'Import failed')
+    },
   })
 
   function handleFile(file: File) {
     setResult(null)
+    setErrorMsg(null)
     importMutation.mutate(file)
   }
 
@@ -84,9 +91,19 @@ export function ImportModal({
             type="file"
             accept={ACCEPTED_EXTS.join(',')}
             className="hidden"
-            onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])}
+            onChange={e => {
+              if (e.target.files?.[0]) handleFile(e.target.files[0])
+              e.target.value = ''
+            }}
           />
         </div>
+
+        {errorMsg && (
+          <div className="flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 mt-2">
+            <AlertTriangle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+            <p className="text-sm text-red-400">{errorMsg}</p>
+          </div>
+        )}
 
         {result && (
           <div className="space-y-2 mt-2">

@@ -28,15 +28,24 @@ class SupplierScorecardSerializer(serializers.ModelSerializer):
         model = Supplier
         fields = ['id', 'name', 'region', 'invoice_count', 'flagged_count', 'total_spend', 'score']
 
+    def _org_ids(self):
+        return self.context.get('org_ids', [])
+
     def get_invoice_count(self, obj):
-        return Invoice.objects.filter(supplier=obj).count()
+        return Invoice.objects.filter(
+            supplier=obj, organization_id__in=self._org_ids(), is_deleted=False
+        ).count()
 
     def get_flagged_count(self, obj):
-        return Invoice.objects.filter(supplier=obj, status='flagged').count()
+        return Invoice.objects.filter(
+            supplier=obj, organization_id__in=self._org_ids(), is_deleted=False, status='flagged'
+        ).count()
 
     def get_total_spend(self, obj):
         from django.db.models import Sum
-        result = Invoice.objects.filter(supplier=obj).aggregate(total=Sum('total_amount'))
+        result = Invoice.objects.filter(
+            supplier=obj, organization_id__in=self._org_ids(), is_deleted=False
+        ).aggregate(total=Sum('total_amount'))
         return result['total'] or 0
 
     def get_score(self, obj):

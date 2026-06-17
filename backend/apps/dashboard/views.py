@@ -36,9 +36,12 @@ class DashboardSummaryView(APIView):
         ).count()
 
         supplier_scores = []
-        for supplier in Supplier.objects.all():
-            total = Invoice.objects.filter(supplier=supplier).count()
-            flagged = Invoice.objects.filter(supplier=supplier, status='flagged').count()
+        for supplier in Supplier.objects.filter(
+            invoices__organization_id__in=org_ids,
+            invoices__is_deleted=False,
+        ).distinct():
+            total = Invoice.objects.filter(supplier=supplier, organization_id__in=org_ids, is_deleted=False).count()
+            flagged = Invoice.objects.filter(supplier=supplier, organization_id__in=org_ids, is_deleted=False, status='flagged').count()
             score = round((1 - flagged / total) * 100) if total > 0 else 100
             supplier_scores.append(score)
         avg_supplier_score = round(sum(supplier_scores) / len(supplier_scores)) if supplier_scores else 0

@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api'
 import type { Invoice } from '@/lib/api'
 import { toast } from 'sonner'
-import { Upload, FileText, AlertTriangle } from 'lucide-react'
+import { Upload, FileText, AlertTriangle, Trash2 } from 'lucide-react'
 import { ImportModal } from '@/components/ImportModal'
 
 function statusColor(s: string) {
@@ -59,6 +59,20 @@ export default function InvoicesPage() {
       setSelected(null)
     },
     onError: () => toast.error('Failed to flag invoice'),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => api.deleteInvoice(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['monthly-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['suppliers'] })
+      queryClient.invalidateQueries({ queryKey: ['fleet-health'] })
+      toast.success('Invoice deleted')
+      setSelected(null)
+    },
+    onError: () => toast.error('Failed to delete invoice'),
   })
 
   return (
@@ -217,6 +231,15 @@ export default function InvoicesPage() {
                   {flagMutation.isPending ? 'Flagging…' : 'Flag'}
                 </Button>
               </div>
+              <Button
+                variant="ghost"
+                className="w-full text-xs text-muted-foreground hover:text-red-400 hover:bg-red-500/10 gap-1.5 mt-1"
+                onClick={() => deleteMutation.mutate(selected.id)}
+                disabled={deleteMutation.isPending}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                {deleteMutation.isPending ? 'Deleting…' : 'Delete invoice'}
+              </Button>
             </div>
           )}
         </SheetContent>
