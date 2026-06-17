@@ -22,7 +22,7 @@ export default function AppLayout() {
       <header className="sticky top-0 z-50 h-14 border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="flex items-center h-full px-6 gap-8">
           {/* Logo + wordmark */}
-          <NavLink to="/app/dashboard" className="flex items-center gap-2.5 shrink-0 mr-2">
+          <NavLink to="/" className="flex items-center gap-2.5 shrink-0 mr-2">
             <Logo size={28} className="text-primary" />
             <span
               className="text-lg font-semibold tracking-tight text-foreground"

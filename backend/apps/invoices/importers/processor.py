@@ -78,12 +78,11 @@ class InvoiceImportProcessor:
                 skipped += 1
                 continue
 
-            try:
-                vehicle = Vehicle.objects.get(vin=vehicle_vin, organization=self.org)
-            except Vehicle.DoesNotExist:
-                errors.append({'row': idx, 'reason': f'Vehicle VIN "{vehicle_vin}" not found in your fleet'})
-                skipped += 1
-                continue
+            vehicle, _ = Vehicle.objects.get_or_create(
+                vin=vehicle_vin,
+                organization=self.org,
+                defaults={'make': 'Unknown', 'model': 'Unknown', 'status': 'active', 'odometer': 0},
+            )
 
             supplier, _ = Supplier.objects.get_or_create(
                 name=supplier_name,
