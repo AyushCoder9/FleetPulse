@@ -61,6 +61,28 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         invoice.save(update_fields=['is_deleted'])
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(detail=False, methods=['post'], url_path='bulk-delete')
+    def bulk_soft_delete(self, request):
+        ids = request.data.get('ids', [])
+        if not isinstance(ids, list) or not ids:
+            return Response({'error': 'ids must be a non-empty list'}, status=status.HTTP_400_BAD_REQUEST)
+
+        org = _get_user_org(request.user)
+        deleted = (
+            Invoice.objects
+            .filter(id__in=ids, organization=org, is_deleted=False)
+            .update(is_deleted=True)
+        )
+        return Response({'deleted': deleted})
+
+    @action(detail=False, methods=['post'], url_path='delete-all')
+    def delete_all(self, request):
+        org = _get_user_org(request.user)
+        if org is None:
+            return Response({'error': 'No organization found'}, status=status.HTTP_400_BAD_REQUEST)
+        deleted = Invoice.objects.filter(organization=org, is_deleted=False).update(is_deleted=True)
+        return Response({'deleted': deleted})
+
     @action(detail=False, methods=['post'], url_path='bulk-approve')
     def bulk_approve(self, request):
         ids = request.data.get('ids', [])

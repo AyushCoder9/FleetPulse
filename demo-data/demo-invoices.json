@@ -1,339 +1,74 @@
 {
   "invoices": [
     {
-      "invoice_number": "INV-2026-0001",
-      "supplier_name": "Castrol Fleet Lubricants",
-      "vehicle_vin": "JTL13BX8H96NU376",
-      "service_type": "Oil Change",
-      "total_amount": 89.99,
-      "date": "2026-04-01",
-      "line_item_desc": "Full synthetic 5W-30, 5qt",
-      "line_item_amount": 89.99,
-      "notes": ""
+      "supplier_name": "Gulf Coast Inspections",
+      "vehicle_vin": "JH4DA9340KS002341",
+      "service_type": "Annual Inspection",
+      "total_amount": 120.0,
+      "date": "2026-05-03"
     },
     {
-      "invoice_number": "INV-2026-0002",
-      "supplier_name": "Bridgestone Fleet Tires",
-      "vehicle_vin": "BEA22VN6E99FI429",
-      "service_type": "Tire Rotation",
-      "total_amount": 49.5,
-      "date": "2026-04-03",
-      "line_item_desc": "4-wheel rotation + torque check",
-      "line_item_amount": 49.5,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0003",
-      "supplier_name": "Jiffy Fleet Services",
-      "vehicle_vin": "FOM14JW6N89NP915",
-      "service_type": "Brake Inspection",
-      "total_amount": 75.0,
-      "date": "2026-04-04",
-      "line_item_desc": "Front & rear pad inspection",
-      "line_item_amount": 75.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0004",
-      "supplier_name": "Valvoline Fleet Centers",
-      "vehicle_vin": "LOK53MN4F60NR081",
-      "service_type": "Oil Change",
+      "supplier_name": "Magnolia Fleet Check",
+      "vehicle_vin": "KNMAT2MT4JP502345",
+      "service_type": "DOT Compliance",
       "total_amount": 95.0,
-      "date": "2026-04-06",
-      "line_item_desc": "Full synthetic 0W-20, 5qt",
-      "line_item_amount": 95.0,
-      "notes": ""
+      "date": "2026-05-06"
     },
     {
-      "invoice_number": "INV-2026-0005",
-      "supplier_name": "Midas Auto Service",
-      "vehicle_vin": "XXJ69KQ4E26GK113",
-      "service_type": "Wheel Alignment",
-      "total_amount": 110.0,
-      "date": "2026-04-08",
-      "line_item_desc": "4-wheel computerized alignment",
-      "line_item_amount": 110.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0006",
-      "supplier_name": "Goodyear Commercial",
-      "vehicle_vin": "ONF34OW3Z63XW389",
-      "service_type": "Tire Rotation",
-      "total_amount": 52.0,
-      "date": "2026-04-09",
-      "line_item_desc": "6-wheel rotation + balance",
-      "line_item_amount": 52.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0007",
-      "supplier_name": "Shell Fleet Solutions",
-      "vehicle_vin": "TXN81RC4J27AZ451",
-      "service_type": "Air Filter Replacement",
-      "total_amount": 38.0,
-      "date": "2026-04-11",
-      "line_item_desc": "OEM air filter + cabin filter",
-      "line_item_amount": 38.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0008",
-      "supplier_name": "Mobil Fleet Care",
-      "vehicle_vin": "RDK14YH7V48QJ912",
-      "service_type": "Oil Change",
-      "total_amount": 92.0,
-      "date": "2026-04-13",
-      "line_item_desc": "Conventional 10W-30, 5qt",
-      "line_item_amount": 92.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0009",
-      "supplier_name": "Firestone Commercial",
-      "vehicle_vin": "CKN76GP6T00CN295",
-      "service_type": "Battery Replacement",
-      "total_amount": 145.0,
-      "date": "2026-04-15",
-      "line_item_desc": "AGM 800CCA battery + install",
-      "line_item_amount": 145.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0010",
-      "supplier_name": "Grease Monkey Fleet",
-      "vehicle_vin": "VBX69WU2O97JT726",
-      "service_type": "Coolant Flush",
-      "total_amount": 88.0,
-      "date": "2026-04-16",
-      "line_item_desc": "Full coolant drain & refill",
-      "line_item_amount": 88.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0011",
-      "supplier_name": "Pep Boys Commercial",
-      "vehicle_vin": "CHU89GG3L55CD144",
-      "service_type": "Fuel Filter",
+      "supplier_name": "Delta Safety Services",
+      "vehicle_vin": "LRBFXESX5LD678901",
+      "service_type": "Emissions Test",
       "total_amount": 65.0,
-      "date": "2026-04-18",
-      "line_item_desc": "In-line fuel filter replacement",
-      "line_item_amount": 65.0,
-      "notes": ""
+      "date": "2026-05-08"
     },
     {
-      "invoice_number": "INV-2026-0012",
-      "supplier_name": "Bridgestone Fleet Tires",
-      "vehicle_vin": "OCT74EW3I27ZC852",
-      "service_type": "Tire Rotation",
-      "total_amount": 49.5,
-      "date": "2026-04-19",
-      "line_item_desc": "4-wheel rotation",
-      "line_item_amount": 49.5,
-      "notes": ""
+      "supplier_name": "Bayou Vehicle Audit",
+      "vehicle_vin": "ML32A3HJ4EH034567",
+      "service_type": "Safety Certification",
+      "total_amount": 140.0,
+      "date": "2026-05-10"
     },
     {
-      "invoice_number": "INV-2026-0013",
-      "supplier_name": "Castrol Fleet Lubricants",
-      "vehicle_vin": "GOT22AQ9C37OC655",
-      "service_type": "Oil Change",
-      "total_amount": 89.99,
-      "date": "2026-04-21",
-      "line_item_desc": "Semi-synthetic 5W-40, 5qt",
-      "line_item_amount": 89.99,
-      "notes": ""
+      "supplier_name": "Gulf Coast Inspections",
+      "vehicle_vin": "NMTKHMBX0JR012345",
+      "service_type": "Fleet Audit",
+      "total_amount": 200.0,
+      "date": "2026-05-12"
     },
     {
-      "invoice_number": "INV-2026-0014",
-      "supplier_name": "Jiffy Fleet Services",
-      "vehicle_vin": "KLP21YM1A19BS189",
-      "service_type": "Fleet Wash",
-      "total_amount": 29.0,
-      "date": "2026-04-22",
-      "line_item_desc": "Exterior fleet wash + wax",
-      "line_item_amount": 29.0,
-      "notes": ""
+      "supplier_name": "Magnolia Fleet Check",
+      "vehicle_vin": "1N4AL3AP4JC234567",
+      "service_type": "Annual Inspection",
+      "total_amount": 120.0,
+      "date": "2026-05-15"
     },
     {
-      "invoice_number": "INV-2026-0015",
-      "supplier_name": "Valvoline Fleet Centers",
-      "vehicle_vin": "JTL13BX8H96NU376",
-      "service_type": "Transmission Service",
-      "total_amount": 185.0,
-      "date": "2026-04-23",
-      "line_item_desc": "ATF fluid drain & fill",
-      "line_item_amount": 185.0,
-      "notes": ""
+      "supplier_name": "Delta Safety Services",
+      "vehicle_vin": "2C4RDGCG5DR345678",
+      "service_type": "Emissions Test",
+      "total_amount": 65.0,
+      "date": "2026-05-17"
     },
     {
-      "invoice_number": "INV-2026-0016",
-      "supplier_name": "Midas Auto Service",
-      "vehicle_vin": "BEA22VN6E99FI429",
-      "service_type": "Brake Inspection",
-      "total_amount": 78.0,
-      "date": "2026-04-25",
-      "line_item_desc": "Rear drum inspection + adjustment",
-      "line_item_amount": 78.0,
-      "notes": ""
+      "supplier_name": "Crescent City Fleet",
+      "vehicle_vin": "3C4NJCBB5JT456789",
+      "service_type": "DOT Compliance",
+      "total_amount": 95.0,
+      "date": "2026-05-20"
     },
     {
-      "invoice_number": "INV-2026-0017",
-      "supplier_name": "Goodyear Commercial",
-      "vehicle_vin": "FOM14JW6N89NP915",
-      "service_type": "Air Filter Replacement",
-      "total_amount": 40.0,
-      "date": "2026-04-26",
-      "line_item_desc": "Heavy-duty panel air filter",
-      "line_item_amount": 40.0,
-      "notes": ""
+      "supplier_name": "Bayou Vehicle Audit",
+      "vehicle_vin": "4JGBF2FE5CA567890",
+      "service_type": "Safety Certification",
+      "total_amount": 140.0,
+      "date": "2026-05-22"
     },
     {
-      "invoice_number": "INV-2026-0018",
-      "supplier_name": "Shell Fleet Solutions",
-      "vehicle_vin": "LOK53MN4F60NR081",
-      "service_type": "Oil Change",
-      "total_amount": 97.0,
-      "date": "2026-04-28",
-      "line_item_desc": "Full synthetic 5W-30, 6qt",
-      "line_item_amount": 97.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0019",
-      "supplier_name": "PriceGouger Inc",
-      "vehicle_vin": "XXJ69KQ4E26GK113",
-      "service_type": "Oil Change",
-      "total_amount": 289.0,
-      "date": "2026-04-29",
-      "line_item_desc": "Full synthetic oil change + 'premium service fee'",
-      "line_item_amount": 289.0,
-      "notes": "ANOMALY: Rate card overcharge \u2014 standard market rate ~$95"
-    },
-    {
-      "invoice_number": "INV-2026-0020",
-      "supplier_name": "PriceGouger Inc",
-      "vehicle_vin": "ONF34OW3Z63XW389",
-      "service_type": "Tire Rotation",
-      "total_amount": 198.0,
-      "date": "2026-04-30",
-      "line_item_desc": "4-wheel rotation + 'fleet premium surcharge'",
-      "line_item_amount": 198.0,
-      "notes": "ANOMALY: Rate card overcharge \u2014 standard market rate ~$52"
-    },
-    {
-      "invoice_number": "INV-2026-0021",
-      "supplier_name": "Firestone Commercial",
-      "vehicle_vin": "TXN81RC4J27AZ451",
-      "service_type": "Oil Change",
-      "total_amount": 91.0,
-      "date": "2026-05-01",
-      "line_item_desc": "Conventional 5W-20, 5qt",
-      "line_item_amount": 91.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0022",
-      "supplier_name": "Grease Monkey Fleet",
-      "vehicle_vin": "RDK14YH7V48QJ912",
-      "service_type": "Wheel Alignment",
-      "total_amount": 112.0,
-      "date": "2026-05-03",
-      "line_item_desc": "2-wheel front alignment",
-      "line_item_amount": 112.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0023",
-      "supplier_name": "Pep Boys Commercial",
-      "vehicle_vin": "CKN76GP6T00CN295",
-      "service_type": "Battery Replacement",
-      "total_amount": 150.0,
-      "date": "2026-05-04",
-      "line_item_desc": "Standard 700CCA battery + install",
-      "line_item_amount": 150.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0024",
-      "supplier_name": "QuickLube Co",
-      "vehicle_vin": "VBX69WU2O97JT726",
-      "service_type": "Oil Change",
-      "total_amount": 184.0,
-      "date": "2026-05-06",
-      "line_item_desc": "Oil change x2 (duplicate billing)",
-      "line_item_amount": 184.0,
-      "notes": "ANOMALY: Duplicate line items \u2014 Oil Change billed twice for same vehicle"
-    },
-    {
-      "invoice_number": "INV-2026-0025",
-      "supplier_name": "Castrol Fleet Lubricants",
-      "vehicle_vin": "JTL13BX8H96NU376",
-      "service_type": "Oil Change",
-      "total_amount": 89.99,
-      "date": "2026-04-04",
-      "line_item_desc": "Full synthetic 5W-30, 5qt",
-      "line_item_amount": 89.99,
-      "notes": "ANOMALY: Frequency \u2014 same vehicle had Oil Change 3 days ago"
-    },
-    {
-      "invoice_number": "INV-2026-0026",
-      "supplier_name": "Bridgestone Fleet Tires",
-      "vehicle_vin": "CHU89GG3L55CD144",
-      "service_type": "Tire Rotation",
-      "total_amount": 51.0,
-      "date": "2026-05-07",
-      "line_item_desc": "4-wheel rotation",
-      "line_item_amount": 51.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0027",
-      "supplier_name": "Midas Auto Service",
-      "vehicle_vin": "OCT74EW3I27ZC852",
-      "service_type": "Coolant Flush",
-      "total_amount": 90.0,
-      "date": "2026-05-09",
-      "line_item_desc": "Coolant system flush & refill",
-      "line_item_amount": 90.0,
-      "notes": ""
-    },
-    {
-      "invoice_number": "INV-2026-0028",
-      "supplier_name": "NewCo Fleet Services",
-      "vehicle_vin": "GOT22AQ9C37OC655",
-      "service_type": "Fleet Wash",
-      "total_amount": 145.0,
-      "date": "2026-05-10",
-      "line_item_desc": "Exterior detailing + interior clean",
-      "line_item_amount": 145.0,
-      "notes": "ANOMALY: New vendor \u2014 first invoice from NewCo Fleet Services"
-    },
-    {
-      "invoice_number": "INV-2026-0029",
-      "supplier_name": "NewCo Fleet Services",
-      "vehicle_vin": "KLP21YM1A19BS189",
-      "service_type": "Oil Change",
-      "total_amount": 102.0,
-      "date": "2026-05-11",
-      "line_item_desc": "Full synthetic oil change",
-      "line_item_amount": 102.0,
-      "notes": "ANOMALY: New vendor \u2014 second invoice from NewCo Fleet Services"
-    },
-    {
-      "invoice_number": "INV-2026-0030",
-      "supplier_name": "Valvoline Fleet Centers",
-      "vehicle_vin": "BEA22VN6E99FI429",
-      "service_type": "Brake Inspection",
-      "total_amount": 79.0,
-      "date": "2026-05-12",
-      "line_item_desc": "Full 4-wheel brake inspection",
-      "line_item_amount": 79.0,
-      "notes": ""
+      "supplier_name": "Crescent City Fleet",
+      "vehicle_vin": "5GAEVCKW4JJ678901",
+      "service_type": "Fleet Audit",
+      "total_amount": 200.0,
+      "date": "2026-05-25"
     }
-  ],
-  "meta": {
-    "count": 30,
-    "generated": "2026-06-16",
-    "anomalies": 5
-  }
+  ]
 }

@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api'
 import type { Invoice } from '@/lib/api'
 import { toast } from 'sonner'
-import { Upload, FileText, AlertTriangle, Trash2 } from 'lucide-react'
+import { Upload, FileText, AlertTriangle, Trash2, CheckSquare, Square, MinusSquare } from 'lucide-react'
 import { ImportModal } from '@/components/ImportModal'
 
 function statusColor(s: string) {
@@ -28,52 +28,82 @@ function StatusDot({ status }: { status: string }) {
   )
 }
 
+const INVALIDATE_KEYS = ['invoices', 'dashboard', 'monthly-stats', 'suppliers', 'fleet-health']
+
 export default function InvoicesPage() {
   const queryClient = useQueryClient()
   const [selected, setSelected] = useState<Invoice | null>(null)
   const [filter, setFilter] = useState<'all' | 'flagged' | 'pending' | 'approved'>('all')
   const [importOpen, setImportOpen] = useState(false)
+  const [checkedIds, setCheckedIds] = useState<Set<number>>(new Set())
+  const [confirmDeleteAll, setConfirmDeleteAll] = useState(false)
 
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ['invoices', filter],
     queryFn: () => api.invoices(filter === 'all' ? undefined : filter),
   })
 
+  const invalidateAll = () => INVALIDATE_KEYS.forEach(k => queryClient.invalidateQueries({ queryKey: [k] }))
+
   const approveMutation = useMutation({
     mutationFn: (id: number) => api.approveInvoice(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-      toast.success('Invoice approved')
-      setSelected(null)
-    },
+    onSuccess: () => { invalidateAll(); toast.success('Invoice approved'); setSelected(null) },
     onError: () => toast.error('Failed to approve invoice'),
   })
 
   const flagMutation = useMutation({
     mutationFn: (id: number) => api.flagInvoice(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-      toast.error('Invoice flagged')
-      setSelected(null)
-    },
+    onSuccess: () => { invalidateAll(); toast.error('Invoice flagged'); setSelected(null) },
     onError: () => toast.error('Failed to flag invoice'),
   })
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => api.deleteInvoice(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-      queryClient.invalidateQueries({ queryKey: ['monthly-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['suppliers'] })
-      queryClient.invalidateQueries({ queryKey: ['fleet-health'] })
-      toast.success('Invoice deleted')
-      setSelected(null)
-    },
+    onSuccess: () => { invalidateAll(); toast.success('Invoice deleted'); setSelected(null) },
     onError: () => toast.error('Failed to delete invoice'),
   })
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: (ids: number[]) => api.bulkDeleteInvoices(ids),
+    onSuccess: (res) => {
+      invalidateAll()
+      setCheckedIds(new Set())
+      toast.success(`${res.deleted} invoice${res.deleted !== 1 ? 's' : ''} deleted`)
+    },
+    onError: () => toast.error('Failed to delete invoices'),
+  })
+
+  const deleteAllMutation = useMutation({
+    mutationFn: () => api.deleteAllInvoices(),
+    onSuccess: (res) => {
+      invalidateAll()
+      setCheckedIds(new Set())
+      setConfirmDeleteAll(false)
+      toast.success(`All ${res.deleted} invoices deleted`)
+    },
+    onError: () => toast.error('Failed to delete all invoices'),
+  })
+
+  const allChecked = invoices.length > 0 && invoices.every(inv => checkedIds.has(inv.id))
+  const someChecked = invoices.some(inv => checkedIds.has(inv.id)) && !allChecked
+
+  function toggleAll() {
+    if (allChecked) {
+      setCheckedIds(new Set())
+    } else {
+      setCheckedIds(new Set(invoices.map(inv => inv.id)))
+    }
+  }
+
+  function toggleOne(id: number) {
+    setCheckedIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  const checkedCount = checkedIds.size
 
   return (
     <div className="p-6 space-y-5 max-w-[1400px] mx-auto">
@@ -82,13 +112,47 @@ export default function InvoicesPage() {
           <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>Invoices</h1>
           <p className="text-muted-foreground text-sm mt-0.5">Review, approve, and investigate fleet invoices</p>
         </div>
-        <Button
-          onClick={() => setImportOpen(true)}
-          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-        >
-          <Upload className="h-4 w-4" />
-          Import Invoices
-        </Button>
+        <div className="flex items-center gap-2">
+          {invoices.length > 0 && (
+            confirmDeleteAll ? (
+              <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-1.5">
+                <span className="text-xs text-red-400">Delete all {invoices.length} invoices?</span>
+                <Button
+                  size="sm"
+                  className="h-6 text-xs bg-red-500 text-white hover:bg-red-600 px-2"
+                  onClick={() => deleteAllMutation.mutate()}
+                  disabled={deleteAllMutation.isPending}
+                >
+                  {deleteAllMutation.isPending ? 'Deleting…' : 'Confirm'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 text-xs px-2"
+                  onClick={() => setConfirmDeleteAll(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="ghost"
+                className="gap-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 text-sm"
+                onClick={() => setConfirmDeleteAll(true)}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Delete all
+              </Button>
+            )
+          )}
+          <Button
+            onClick={() => setImportOpen(true)}
+            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            <Upload className="h-4 w-4" />
+            Import Invoices
+          </Button>
+        </div>
       </div>
 
       {/* Filter tabs */}
@@ -108,10 +172,42 @@ export default function InvoicesPage() {
         ))}
       </div>
 
+      {/* Bulk action toolbar */}
+      {checkedCount > 0 && (
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-primary/10 border border-primary/20 rounded-lg">
+          <span className="text-sm font-medium text-primary">{checkedCount} selected</span>
+          <Button
+            size="sm"
+            className="h-7 text-xs bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
+            onClick={() => bulkDeleteMutation.mutate(Array.from(checkedIds))}
+            disabled={bulkDeleteMutation.isPending}
+          >
+            <Trash2 className="h-3 w-3 mr-1" />
+            {bulkDeleteMutation.isPending ? 'Deleting…' : `Delete ${checkedCount}`}
+          </Button>
+          <button
+            className="text-xs text-muted-foreground hover:text-foreground ml-auto"
+            onClick={() => setCheckedIds(new Set())}
+          >
+            Clear selection
+          </button>
+        </div>
+      )}
+
       <div className="border border-border rounded-xl overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="w-10 pl-4">
+                <button onClick={toggleAll} className="flex items-center text-muted-foreground hover:text-foreground">
+                  {allChecked
+                    ? <CheckSquare className="h-4 w-4 text-primary" />
+                    : someChecked
+                    ? <MinusSquare className="h-4 w-4 text-primary" />
+                    : <Square className="h-4 w-4" />
+                  }
+                </button>
+              </TableHead>
               <TableHead className="text-xs uppercase tracking-wider text-muted-foreground">ID</TableHead>
               <TableHead className="text-xs uppercase tracking-wider text-muted-foreground">Supplier</TableHead>
               <TableHead className="text-xs uppercase tracking-wider text-muted-foreground">Vehicle</TableHead>
@@ -125,7 +221,7 @@ export default function InvoicesPage() {
             {isLoading
               ? Array.from({ length: 6 }).map((_, i) => (
                   <TableRow key={i} className="border-border">
-                    {Array.from({ length: 7 }).map((_, j) => (
+                    {Array.from({ length: 8 }).map((_, j) => (
                       <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                     ))}
                   </TableRow>
@@ -133,7 +229,7 @@ export default function InvoicesPage() {
               : invoices.length === 0
               ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-12">
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-12">
                       <FileText className="h-8 w-8 mx-auto mb-2 opacity-20" />
                       <p>No invoices found</p>
                       <button
@@ -148,16 +244,28 @@ export default function InvoicesPage() {
               : invoices.map(inv => (
                   <TableRow
                     key={inv.id}
-                    className="cursor-pointer border-border hover:bg-secondary/30 transition-colors"
-                    onClick={() => setSelected(inv)}
+                    className={`border-border transition-colors ${
+                      checkedIds.has(inv.id) ? 'bg-primary/5' : 'hover:bg-secondary/30'
+                    }`}
                   >
-                    <TableCell className="font-data text-xs text-muted-foreground">#{inv.id}</TableCell>
-                    <TableCell className="text-sm font-medium">{inv.supplier_name}</TableCell>
-                    <TableCell className="font-data text-xs text-muted-foreground">{inv.vehicle_vin}</TableCell>
-                    <TableCell className="text-sm">{inv.service_type}</TableCell>
-                    <TableCell className="font-data text-sm text-foreground">${Number(inv.total_amount).toLocaleString()}</TableCell>
-                    <TableCell><StatusDot status={inv.status} /></TableCell>
-                    <TableCell className="text-xs text-muted-foreground font-data">
+                    <TableCell className="pl-4" onClick={e => { e.stopPropagation(); toggleOne(inv.id) }}>
+                      <button className="flex items-center text-muted-foreground hover:text-foreground">
+                        {checkedIds.has(inv.id)
+                          ? <CheckSquare className="h-4 w-4 text-primary" />
+                          : <Square className="h-4 w-4" />
+                        }
+                      </button>
+                    </TableCell>
+                    <TableCell
+                      className="font-data text-xs text-muted-foreground cursor-pointer"
+                      onClick={() => setSelected(inv)}
+                    >#{inv.id}</TableCell>
+                    <TableCell className="text-sm font-medium cursor-pointer" onClick={() => setSelected(inv)}>{inv.supplier_name}</TableCell>
+                    <TableCell className="font-data text-xs text-muted-foreground cursor-pointer" onClick={() => setSelected(inv)}>{inv.vehicle_vin}</TableCell>
+                    <TableCell className="text-sm cursor-pointer" onClick={() => setSelected(inv)}>{inv.service_type}</TableCell>
+                    <TableCell className="font-data text-sm text-foreground cursor-pointer" onClick={() => setSelected(inv)}>${Number(inv.total_amount).toLocaleString()}</TableCell>
+                    <TableCell className="cursor-pointer" onClick={() => setSelected(inv)}><StatusDot status={inv.status} /></TableCell>
+                    <TableCell className="text-xs text-muted-foreground font-data cursor-pointer" onClick={() => setSelected(inv)}>
                       {new Date(inv.created_at).toLocaleDateString()}
                     </TableCell>
                   </TableRow>
@@ -248,7 +356,10 @@ export default function InvoicesPage() {
       <ImportModal
         open={importOpen}
         onClose={() => setImportOpen(false)}
-        onDone={() => queryClient.invalidateQueries({ queryKey: ['invoices'] })}
+        onDone={() => {
+          setCheckedIds(new Set())
+          invalidateAll()
+        }}
       />
     </div>
   )

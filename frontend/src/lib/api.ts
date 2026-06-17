@@ -156,6 +156,15 @@ export const api = {
   deleteInvoice: (id: number) =>
     request<void>(`/api/v1/invoices/${id}/soft_delete/`, { method: 'DELETE' }),
 
+  bulkDeleteInvoices: (ids: number[]) =>
+    request<{ deleted: number }>('/api/v1/invoices/bulk-delete/', {
+      method: 'POST',
+      body: JSON.stringify({ ids }),
+    }),
+
+  deleteAllInvoices: () =>
+    request<{ deleted: number }>('/api/v1/invoices/delete-all/', { method: 'POST' }),
+
   spendTrend: () => request<SpendTrendItem[]>('/api/v1/analytics/spend-trend/'),
 
   fleetHealth: () => request<FleetHealth>('/api/v1/analytics/fleet-health/'),

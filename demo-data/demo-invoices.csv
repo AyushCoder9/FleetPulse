@@ -1,31 +1,11 @@
-invoice_number,supplier_name,vehicle_vin,service_type,total_amount,date,line_item_desc,line_item_amount,notes
-INV-2026-0001,Castrol Fleet Lubricants,JTL13BX8H96NU376,Oil Change,89.99,2026-04-01,"Full synthetic 5W-30, 5qt",89.99,
-INV-2026-0002,Bridgestone Fleet Tires,BEA22VN6E99FI429,Tire Rotation,49.5,2026-04-03,4-wheel rotation + torque check,49.5,
-INV-2026-0003,Jiffy Fleet Services,FOM14JW6N89NP915,Brake Inspection,75.0,2026-04-04,Front & rear pad inspection,75.0,
-INV-2026-0004,Valvoline Fleet Centers,LOK53MN4F60NR081,Oil Change,95.0,2026-04-06,"Full synthetic 0W-20, 5qt",95.0,
-INV-2026-0005,Midas Auto Service,XXJ69KQ4E26GK113,Wheel Alignment,110.0,2026-04-08,4-wheel computerized alignment,110.0,
-INV-2026-0006,Goodyear Commercial,ONF34OW3Z63XW389,Tire Rotation,52.0,2026-04-09,6-wheel rotation + balance,52.0,
-INV-2026-0007,Shell Fleet Solutions,TXN81RC4J27AZ451,Air Filter Replacement,38.0,2026-04-11,OEM air filter + cabin filter,38.0,
-INV-2026-0008,Mobil Fleet Care,RDK14YH7V48QJ912,Oil Change,92.0,2026-04-13,"Conventional 10W-30, 5qt",92.0,
-INV-2026-0009,Firestone Commercial,CKN76GP6T00CN295,Battery Replacement,145.0,2026-04-15,AGM 800CCA battery + install,145.0,
-INV-2026-0010,Grease Monkey Fleet,VBX69WU2O97JT726,Coolant Flush,88.0,2026-04-16,Full coolant drain & refill,88.0,
-INV-2026-0011,Pep Boys Commercial,CHU89GG3L55CD144,Fuel Filter,65.0,2026-04-18,In-line fuel filter replacement,65.0,
-INV-2026-0012,Bridgestone Fleet Tires,OCT74EW3I27ZC852,Tire Rotation,49.5,2026-04-19,4-wheel rotation,49.5,
-INV-2026-0013,Castrol Fleet Lubricants,GOT22AQ9C37OC655,Oil Change,89.99,2026-04-21,"Semi-synthetic 5W-40, 5qt",89.99,
-INV-2026-0014,Jiffy Fleet Services,KLP21YM1A19BS189,Fleet Wash,29.0,2026-04-22,Exterior fleet wash + wax,29.0,
-INV-2026-0015,Valvoline Fleet Centers,JTL13BX8H96NU376,Transmission Service,185.0,2026-04-23,ATF fluid drain & fill,185.0,
-INV-2026-0016,Midas Auto Service,BEA22VN6E99FI429,Brake Inspection,78.0,2026-04-25,Rear drum inspection + adjustment,78.0,
-INV-2026-0017,Goodyear Commercial,FOM14JW6N89NP915,Air Filter Replacement,40.0,2026-04-26,Heavy-duty panel air filter,40.0,
-INV-2026-0018,Shell Fleet Solutions,LOK53MN4F60NR081,Oil Change,97.0,2026-04-28,"Full synthetic 5W-30, 6qt",97.0,
-INV-2026-0019,PriceGouger Inc,XXJ69KQ4E26GK113,Oil Change,289.0,2026-04-29,Full synthetic oil change + 'premium service fee',289.0,ANOMALY: Rate card overcharge — standard market rate ~$95
-INV-2026-0020,PriceGouger Inc,ONF34OW3Z63XW389,Tire Rotation,198.0,2026-04-30,4-wheel rotation + 'fleet premium surcharge',198.0,ANOMALY: Rate card overcharge — standard market rate ~$52
-INV-2026-0021,Firestone Commercial,TXN81RC4J27AZ451,Oil Change,91.0,2026-05-01,"Conventional 5W-20, 5qt",91.0,
-INV-2026-0022,Grease Monkey Fleet,RDK14YH7V48QJ912,Wheel Alignment,112.0,2026-05-03,2-wheel front alignment,112.0,
-INV-2026-0023,Pep Boys Commercial,CKN76GP6T00CN295,Battery Replacement,150.0,2026-05-04,Standard 700CCA battery + install,150.0,
-INV-2026-0024,QuickLube Co,VBX69WU2O97JT726,Oil Change,184.0,2026-05-06,Oil change x2 (duplicate billing),184.0,ANOMALY: Duplicate line items — Oil Change billed twice for same vehicle
-INV-2026-0025,Castrol Fleet Lubricants,JTL13BX8H96NU376,Oil Change,89.99,2026-04-04,"Full synthetic 5W-30, 5qt",89.99,ANOMALY: Frequency — same vehicle had Oil Change 3 days ago
-INV-2026-0026,Bridgestone Fleet Tires,CHU89GG3L55CD144,Tire Rotation,51.0,2026-05-07,4-wheel rotation,51.0,
-INV-2026-0027,Midas Auto Service,OCT74EW3I27ZC852,Coolant Flush,90.0,2026-05-09,Coolant system flush & refill,90.0,
-INV-2026-0028,NewCo Fleet Services,GOT22AQ9C37OC655,Fleet Wash,145.0,2026-05-10,Exterior detailing + interior clean,145.0,ANOMALY: New vendor — first invoice from NewCo Fleet Services
-INV-2026-0029,NewCo Fleet Services,KLP21YM1A19BS189,Oil Change,102.0,2026-05-11,Full synthetic oil change,102.0,ANOMALY: New vendor — second invoice from NewCo Fleet Services
-INV-2026-0030,Valvoline Fleet Centers,BEA22VN6E99FI429,Brake Inspection,79.0,2026-05-12,Full 4-wheel brake inspection,79.0,
+supplier_name,vehicle_vin,service_type,total_amount,date,line_item_desc,line_item_amount
+Cascade Fleet Services,1HGCM82633A004352,Oil Change,89.99,2026-05-02,Full synthetic 5W-30 5qt,89.99
+RainCity AutoCare,2T1BURHE0JC048821,Tire Rotation,54.5,2026-05-05,4-wheel rotation + torque check,54.5
+PNW Brake & Lube,3VWFE21C04M000112,Brake Inspection,78.0,2026-05-07,Front & rear pad check,78.0
+Northwest Tire Co,4T1BF3EK5AU561234,Wiper Replacement,42.0,2026-05-09,Bosch premium blades pair,42.0
+Cascade Fleet Services,5XYKT3A62CG223344,Air Filter,38.5,2026-05-11,OEM engine air filter,38.5
+Puget Sound Garage,6G1ZD5ST5KS871234,Battery Check,165.0,2026-05-14,AGM 750CCA battery install,165.0
+RainCity AutoCare,7MZGP4GY5LF012345,Coolant Top-up,35.0,2026-05-16,Extended-life coolant 1gal,35.0
+PNW Brake & Lube,8AFPK7BC0L6789012,Oil Change,95.0,2026-05-19,Synthetic blend 0W-20 5qt,95.0
+Northwest Tire Co,9BWZZZ377VT004251,Cabin Filter,48.0,2026-05-21,HEPA cabin air filter,48.0
+Puget Sound Garage,1G1ZD5ST5KF123456,Tire Rotation,54.5,2026-05-23,6-wheel rotation + balance,54.5
