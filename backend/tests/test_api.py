@@ -151,9 +151,12 @@ class TestSuppliers:
     def _results(self, res):
         return res.data['results'] if 'results' in res.data else res.data
 
-    def test_list_suppliers(self, auth_client):
-        SupplierFactory(name='Alpha')
-        SupplierFactory(name='Beta')
+    def test_list_suppliers(self, auth_client, org):
+        vehicle = VehicleFactory(organization=org)
+        s1 = SupplierFactory(name='Alpha')
+        s2 = SupplierFactory(name='Beta')
+        InvoiceFactory(organization=org, supplier=s1, vehicle=vehicle)
+        InvoiceFactory(organization=org, supplier=s2, vehicle=vehicle)
         res = auth_client.get('/api/v1/suppliers/')
         assert res.status_code == status.HTTP_200_OK
         assert len(self._results(res)) == 2
