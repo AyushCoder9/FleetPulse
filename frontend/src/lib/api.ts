@@ -64,13 +64,10 @@ export interface ImportResult {
   errors: Array<{ row: number; reason: string }>
 }
 
+import { tokenStore } from './tokenStore'
+
 async function getToken(): Promise<string | null> {
-  try {
-    type ClerkWindow = { Clerk?: { session?: { getToken: () => Promise<string> } } }
-    const clerk = (window as unknown as ClerkWindow).Clerk
-    if (clerk?.session) return await clerk.session.getToken()
-  } catch { /* ignore */ }
-  return null
+  return tokenStore.get()
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
