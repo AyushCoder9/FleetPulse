@@ -17,8 +17,8 @@ export default function AppLayout() {
   const { theme, toggle } = useTheme()
   const navigate = useNavigate()
 
-  function handleLogout() {
-    logout()
+  async function handleLogout() {
+    await logout()
     navigate('/login')
   }
 

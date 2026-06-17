@@ -1,5 +1,6 @@
-import { lazy, Suspense } from 'react'
+import { Suspense, lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { AuthenticateWithRedirectCallback } from '@clerk/clerk-react'
 import LandingPage from '@/pages/LandingPage'
 import LoginPage from '@/pages/LoginPage'
 import DemoPage from '@/pages/DemoPage'
@@ -10,28 +11,24 @@ import SuppliersPage from '@/pages/SuppliersPage'
 import AppLayout from '@/components/AppLayout'
 import { useAuth } from '@/lib/auth'
 
-const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined
-
-// Clerk SSO callback — only loaded when Clerk is configured
-const SsoCallback = CLERK_KEY
-  ? lazy(() =>
-      import('@clerk/clerk-react').then(({ AuthenticateWithRedirectCallback }) => ({
-        default: function SsoCallbackPage() {
-          return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-              <AuthenticateWithRedirectCallback
-                afterSignInUrl="/app/dashboard"
-                afterSignUpUrl="/app/dashboard"
-              />
-            </div>
-          )
-        },
-      }))
-    )
-  : null
+const SsoCallbackPage = lazy(() =>
+  Promise.resolve({
+    default: function SsoCallback() {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <AuthenticateWithRedirectCallback
+            afterSignInUrl="/app/dashboard"
+            afterSignUpUrl="/app/dashboard"
+          />
+        </div>
+      )
+    },
+  })
+)
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { token } = useAuth()
+  const { token, isLoaded } = useAuth()
+  if (!isLoaded) return <div className="min-h-screen bg-background" />
   return token ? <>{children}</> : <Navigate to="/login" replace />
 }
 
@@ -41,18 +38,14 @@ export default function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/demo" element={<DemoPage />} />
-
-      {/* Clerk OAuth callback */}
-      {CLERK_KEY && SsoCallback && (
-        <Route
-          path="/sso-callback"
-          element={
-            <Suspense fallback={<div className="min-h-screen bg-background" />}>
-              <SsoCallback />
-            </Suspense>
-          }
-        />
-      )}
+      <Route
+        path="/sso-callback"
+        element={
+          <Suspense fallback={<div className="min-h-screen bg-background" />}>
+            <SsoCallbackPage />
+          </Suspense>
+        }
+      />
 
       <Route
         path="/app"

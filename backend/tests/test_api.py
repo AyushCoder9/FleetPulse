@@ -35,9 +35,7 @@ def user(org):
 
 @pytest.fixture
 def auth_client(client, user):
-    res = client.post('/api/v1/auth/token/', {'username': user.username, 'password': 'password123'}, format='json')
-    assert res.status_code == 200
-    client.credentials(HTTP_AUTHORIZATION=f'Bearer {res.data["access"]}')
+    client.force_authenticate(user=user)
     return client
 
 
@@ -45,23 +43,6 @@ def auth_client(client, user):
 
 @pytest.mark.django_db
 class TestAuth:
-    def test_obtain_token(self, client, user):
-        res = client.post('/api/v1/auth/token/', {'username': user.username, 'password': 'password123'}, format='json')
-        assert res.status_code == status.HTTP_200_OK
-        assert 'access' in res.data
-        assert 'refresh' in res.data
-
-    def test_wrong_password_rejected(self, client, user):
-        res = client.post('/api/v1/auth/token/', {'username': user.username, 'password': 'wrong'}, format='json')
-        assert res.status_code == status.HTTP_401_UNAUTHORIZED
-
-    def test_refresh_token(self, client, user):
-        res = client.post('/api/v1/auth/token/', {'username': user.username, 'password': 'password123'}, format='json')
-        refresh = res.data['refresh']
-        res2 = client.post('/api/v1/auth/token/refresh/', {'refresh': refresh}, format='json')
-        assert res2.status_code == status.HTTP_200_OK
-        assert 'access' in res2.data
-
     def test_protected_endpoint_requires_auth(self, client):
         res = client.get('/api/v1/invoices/')
         assert res.status_code == status.HTTP_401_UNAUTHORIZED

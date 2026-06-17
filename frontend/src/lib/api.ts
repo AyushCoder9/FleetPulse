@@ -64,12 +64,17 @@ export interface ImportResult {
   errors: Array<{ row: number; reason: string }>
 }
 
-function getToken(): string | null {
-  return localStorage.getItem('fleetpulse_token')
+async function getToken(): Promise<string | null> {
+  try {
+    type ClerkWindow = { Clerk?: { session?: { getToken: () => Promise<string> } } }
+    const clerk = (window as unknown as ClerkWindow).Clerk
+    if (clerk?.session) return await clerk.session.getToken()
+  } catch { /* ignore */ }
+  return null
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const token = getToken()
+  const token = await getToken()
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -78,9 +83,6 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     ...options,
   })
   if (res.status === 401) {
-    localStorage.removeItem('fleetpulse_token')
-    localStorage.removeItem('fleetpulse_refresh')
-    localStorage.removeItem('fleetpulse_user')
     window.location.href = '/login'
     throw new Error('Unauthorized')
   }
@@ -92,12 +94,6 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 interface Paginated<T> { count: number; results: T[] }
 
 export const api = {
-  login: (username: string, password: string) =>
-    request<{ access: string; refresh: string }>('/api/v1/auth/token/', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-    }),
-
   dashboard: () => request<DashboardSummary>('/api/v1/dashboard/summary/'),
 
   invoices: async (status?: string): Promise<Invoice[]> => {
@@ -118,7 +114,7 @@ export const api = {
     }),
 
   importInvoices: async (file: File): Promise<ImportResult> => {
-    const token = getToken()
+    const token = await getToken()
     const formData = new FormData()
     formData.append('file', file)
     const res = await fetch(`${BASE_URL}/api/v1/invoices/import/`, {
@@ -127,7 +123,6 @@ export const api = {
       body: formData,
     })
     if (res.status === 401) {
-      localStorage.removeItem('fleetpulse_token')
       window.location.href = '/login'
       throw new Error('Unauthorized')
     }
