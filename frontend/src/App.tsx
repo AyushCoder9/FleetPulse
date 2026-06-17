@@ -1,6 +1,4 @@
-import { Suspense, lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { AuthenticateWithRedirectCallback } from '@clerk/clerk-react'
 import LandingPage from '@/pages/LandingPage'
 import LoginPage from '@/pages/LoginPage'
 import DemoPage from '@/pages/DemoPage'
@@ -10,21 +8,6 @@ import VehiclesPage from '@/pages/VehiclesPage'
 import SuppliersPage from '@/pages/SuppliersPage'
 import AppLayout from '@/components/AppLayout'
 import { useAuth } from '@/lib/auth'
-
-const SsoCallbackPage = lazy(() =>
-  Promise.resolve({
-    default: function SsoCallback() {
-      return (
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <AuthenticateWithRedirectCallback
-            afterSignInUrl="/app/dashboard"
-            afterSignUpUrl="/app/dashboard"
-          />
-        </div>
-      )
-    },
-  })
-)
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token, isLoaded } = useAuth()
@@ -38,14 +21,6 @@ export default function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/demo" element={<DemoPage />} />
-      <Route
-        path="/sso-callback"
-        element={
-          <Suspense fallback={<div className="min-h-screen bg-background" />}>
-            <SsoCallbackPage />
-          </Suspense>
-        }
-      />
 
       <Route
         path="/app"
@@ -63,10 +38,10 @@ export default function App() {
       </Route>
 
       {/* legacy redirects */}
-      <Route path="/dashboard" element={<Navigate to="/app/dashboard" replace />} />
-      <Route path="/invoices" element={<Navigate to="/app/invoices" replace />} />
-      <Route path="/vehicles" element={<Navigate to="/app/vehicles" replace />} />
-      <Route path="/suppliers" element={<Navigate to="/app/suppliers" replace />} />
+      <Route path="/dashboard"  element={<Navigate to="/app/dashboard" replace />} />
+      <Route path="/invoices"   element={<Navigate to="/app/invoices"  replace />} />
+      <Route path="/vehicles"   element={<Navigate to="/app/vehicles"  replace />} />
+      <Route path="/suppliers"  element={<Navigate to="/app/suppliers" replace />} />
     </Routes>
   )
 }
