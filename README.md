@@ -9,17 +9,19 @@
 
 ## What it does
 
-FleetPulse ingests fleet invoices (CSV, Excel, JSON, or manual entry), runs 5 anomaly detectors against each one, and gives operations teams a command-center dashboard to approve, flag, or dispute charges in seconds.
+FleetPulse ingests fleet invoices (CSV, Excel, JSON), runs 5 anomaly detectors against each one, and gives operations teams a command-center dashboard to approve, flag, or dispute charges in seconds. Every KPI and chart updates the moment invoices are imported or deleted.
 
 ## Features
 
-- **Multi-format invoice import** — CSV, `.xlsx`, `.xls`, JSON via drag-and-drop
+- **Multi-format invoice import** — CSV, `.xlsx`, `.xls`, JSON via drag-and-drop; auto-creates vehicles from VIN on import
 - **5 anomaly detectors** — Rate card variance, duplicate line items, statistical outlier (2σ), frequency anomaly, new vendor
+- **Bulk delete** — checkbox-select invoices, delete selected or delete all; dashboard KPIs and fleet health update immediately
 - **Soft-delete + audit trail** — `is_deleted`, `approved_by`, `approved_at` on every invoice
-- **Bulk approve** — select multiple invoices, approve in one click
-- **Supplier scorecards** — ranked by flagged-invoice ratio
-- **Analytics** — monthly spend trend by service type, fleet health status distribution
-- **Clerk / Google OAuth** — drop-in social login (falls back to SimpleJWT for local dev)
+- **Supplier scorecards** — ranked by flagged-invoice ratio with horizontal score chart
+- **Analytics** — monthly spend trend, flagged invoice trend, fleet health donut, supplier score bars
+- **Live demo mode** — `/demo`, `/demo/invoices`, `/demo/vehicles`, `/demo/suppliers` fully calculated from a realistic 100-vehicle dataset; no auth required
+- **Multi-tenant isolation** — every query scoped to the user's organisation; VIN unique per org
+- **Clerk / Google OAuth** — drop-in social login; falls back to SimpleJWT for local dev
 - **Dark command-center UI** — amber-gold on near-black, JetBrains Mono data values, Space Grotesk headings
 - **Light/dark toggle** — two dark variants (charcoal "light", near-black "dark")
 
@@ -27,7 +29,7 @@ FleetPulse ingests fleet invoices (CSV, Excel, JSON, or manual entry), runs 5 an
 
 | Layer | Libraries |
 |-------|-----------|
-| Frontend | React 19, Vite 8, Tailwind v4, shadcn, TanStack Query 5, Recharts 3, framer-motion, React Router 7 |
+| Frontend | React 19, Vite 8, Tailwind v4, shadcn, TanStack Query 5, Recharts 3, React Router 7 |
 | Backend | Django 5, DRF, SimpleJWT, Celery (eager mode locally), Postgres (prod) / SQLite (dev) |
 | Auth | Clerk JWKS JWT verification + SimpleJWT fallback |
 | Fonts | Space Grotesk (display), Inter (body), JetBrains Mono (data) |
@@ -67,7 +69,7 @@ To stop:
 ./dev-down.sh
 ```
 
-### Manual steps (if you prefer)
+### Manual steps
 
 ```bash
 # Backend
@@ -111,48 +113,65 @@ FleetPulse/
 ├── frontend/                  # React 19 + Vite 8
 │   ├── src/
 │   │   ├── pages/
-│   │   │   ├── LandingPage.tsx      # Public marketing page
-│   │   │   ├── LoginPage.tsx        # SimpleJWT or Clerk login
-│   │   │   ├── DashboardPage.tsx    # Command center
-│   │   │   ├── InvoicesPage.tsx     # List + import + detail sheet
-│   │   │   ├── VehiclesPage.tsx     # Fleet roster
-│   │   │   └── SuppliersPage.tsx    # Supplier scorecards
+│   │   │   ├── LandingPage.tsx        # Public marketing page
+│   │   │   ├── LoginPage.tsx          # SimpleJWT or Clerk login
+│   │   │   ├── DashboardPage.tsx      # Command center (live data)
+│   │   │   ├── InvoicesPage.tsx       # Bulk select / delete / import / detail sheet
+│   │   │   ├── VehiclesPage.tsx       # Fleet roster
+│   │   │   ├── SuppliersPage.tsx      # Supplier scorecards + chart
+│   │   │   ├── DemoPage.tsx           # /demo — dashboard with dummy data
+│   │   │   ├── DemoInvoicesPage.tsx   # /demo/invoices — read-only invoice table
+│   │   │   ├── DemoVehiclesPage.tsx   # /demo/vehicles — fleet KPIs + table
+│   │   │   └── DemoSuppliersPage.tsx  # /demo/suppliers — score chart + table
 │   │   ├── components/
-│   │   │   ├── AppLayout.tsx        # Top horizontal nav (no sidebar)
-│   │   │   └── Logo.tsx             # SVG FP + ECG logo
+│   │   │   ├── AppLayout.tsx          # Authenticated top nav
+│   │   │   ├── DemoLayout.tsx         # Shared header + nav for all /demo/* routes
+│   │   │   └── Logo.tsx               # SVG FP + ECG logo
 │   │   └── lib/
-│   │       ├── api.ts               # Typed API client
-│   │       └── theme.tsx            # Light/dark context
+│   │       ├── api.ts                 # Typed API client (bulk-delete, delete-all, import)
+│   │       ├── demo-data.ts           # Central dummy dataset for all demo pages
+│   │       └── theme.tsx              # Light/dark context
 │   └── public/favicon.svg
 │
 └── backend/                   # Django 5 + DRF
     └── apps/
         ├── invoices/
-        │   ├── models.py            # Invoice + InvoiceLineItem (soft-delete, audit)
-        │   ├── views.py             # List, approve, flag, bulk-approve, import
-        │   ├── services.py          # InvoiceReconciliationService
-        │   └── importers/           # Strategy pattern: CSV / Excel / JSON
+        │   ├── models.py              # Invoice + InvoiceLineItem (soft-delete, audit)
+        │   ├── views.py               # CRUD, approve, flag, bulk-delete, delete-all, import
+        │   ├── services.py            # InvoiceReconciliationService
+        │   └── importers/             # Strategy pattern: CSV / Excel / JSON
         ├── anomalies/
-        │   └── detectors.py         # 5 detectors + DetectorRegistry
+        │   └── detectors.py           # 5 detectors + DetectorRegistry
         ├── analytics/
-        │   └── views.py             # spend-trend, fleet-health endpoints
+        │   └── views.py               # spend-trend, fleet-health (active-invoice filter)
         ├── dashboard/
-        │   └── views.py             # Aggregated summary KPIs
-        ├── organizations/           # Multi-tenant, is_demo flag
-        ├── vehicles/
-        └── suppliers/               # Scorecard endpoint
+        │   └── views.py               # Aggregated summary KPIs
+        ├── organizations/             # Multi-tenant, is_demo flag
+        ├── vehicles/                  # Auto-created on import; VIN unique per org
+        └── suppliers/                 # Scorecard endpoint
 ```
 
 ### Invoice import flow
 
 ```
 File upload (CSV / Excel / JSON)
-  → get_importer(ext)            registry.py
-  → importer.parse(file)         → list[dict]
-  → InvoiceImportProcessor       validates rows, creates Invoice + LineItems
-  → reconcile_invoice.delay()    Celery task (eager in dev)
-  → DetectorRegistry.run_all()   5 detectors
-  → AnomalyFlag created          medium/high severity → status='flagged'
+  → get_importer(ext)              registry.py
+  → importer.parse(file)           → list[dict]
+  → InvoiceImportProcessor         get_or_create vehicle by VIN, create Invoice + LineItems
+  → reconcile_invoice.delay()      Celery task (eager in dev)
+  → DetectorRegistry.run_all()     5 detectors
+  → AnomalyFlag created            medium/high severity → status='flagged'
+```
+
+### Bulk delete flow
+
+```
+Select invoices (checkboxes) or "Delete all"
+  → POST /api/v1/invoices/bulk-delete/   {"ids": [...]}
+  → POST /api/v1/invoices/delete-all/
+  → Invoice.is_deleted = True            (soft delete, scoped to org)
+  → TanStack Query invalidates           invoices + dashboard + monthly-stats + suppliers + fleet-health
+  → All KPIs and charts re-fetch → zero  if no invoices remain
 ```
 
 ## Deployment
@@ -181,8 +200,8 @@ source .venv/bin/activate
 pytest
 ```
 
-34 tests covering auth, invoice CRUD, anomaly detectors, and service layer.
+31 tests covering auth, invoice CRUD, bulk operations, anomaly detectors, vehicle scoping, and supplier scorecards.
 
 ## License
 
-MIT — Built by [Ayush Kumar](https://github.com/AyushCoder9)
+MIT
