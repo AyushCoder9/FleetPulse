@@ -1,5 +1,6 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, FileText, Truck, Users, LogOut, Moon, Sun } from 'lucide-react'
+import { Outlet, NavLink } from 'react-router-dom'
+import { LayoutDashboard, FileText, Truck, Users, Moon, Sun } from 'lucide-react'
+import { UserButton } from '@clerk/clerk-react'
 import { useAuth } from '@/lib/auth'
 import { useTheme } from '@/lib/theme'
 import Logo from '@/components/Logo'
@@ -13,14 +14,8 @@ const navItems = [
 ]
 
 export default function AppLayout() {
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   const { theme, toggle } = useTheme()
-  const navigate = useNavigate()
-
-  async function handleLogout() {
-    await logout()
-    navigate('/login')
-  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -69,19 +64,13 @@ export default function AppLayout() {
               {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
 
-            {/* User info + logout */}
+            {/* User info + Clerk avatar */}
             <div className="flex items-center gap-3 pl-3 border-l border-border">
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-medium text-foreground leading-tight">{user?.name}</p>
                 <p className="text-xs text-muted-foreground leading-tight">{user?.org}</p>
               </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors px-2 py-1.5 rounded-md hover:bg-secondary"
-              >
-                <LogOut className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Logout</span>
-              </button>
+              <UserButton afterSignOutUrl="/login" />
             </div>
           </div>
         </div>

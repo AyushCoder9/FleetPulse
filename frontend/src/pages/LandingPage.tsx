@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth as useClerkAuth } from '@clerk/clerk-react'
 import { motion, useInView } from 'framer-motion'
 import {
   AlertTriangle, TrendingDown, Clock, Upload,
@@ -119,7 +120,7 @@ function FeatureRow({
 
 /* ── sections ────────────────────────────────────────────────────────── */
 
-function Nav({ scrolled }: { scrolled: boolean }) {
+function Nav({ scrolled, isSignedIn }: { scrolled: boolean; isSignedIn: boolean }) {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -139,25 +140,36 @@ function Nav({ scrolled }: { scrolled: boolean }) {
           <a href="#stats" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Results</a>
         </div>
         <div className="ml-auto flex items-center gap-3">
-          <Link
-            to="/login"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline"
-          >
-            Sign in
-          </Link>
-          <Link
-            to="/login"
-            className="text-sm font-semibold bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-all duration-150 glow-amber"
-          >
-            Get started →
-          </Link>
+          {isSignedIn ? (
+            <Link
+              to="/app/dashboard"
+              className="text-sm font-semibold bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-all duration-150 glow-amber"
+            >
+              Go to app →
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline"
+              >
+                Sign in
+              </Link>
+              <Link
+                to="/login"
+                className="text-sm font-semibold bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-all duration-150 glow-amber"
+              >
+                Get started →
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
   )
 }
 
-function Hero() {
+function Hero({ isSignedIn }: { isSignedIn: boolean }) {
   const words = ['Your fleet bills', 'are lying', 'to you.']
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden">
@@ -212,10 +224,10 @@ function Hero() {
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Link
-            to="/login"
+            to={isSignedIn ? '/app/dashboard' : '/login'}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-3.5 rounded-xl text-base hover:bg-primary/90 transition-all glow-amber"
           >
-            Start free — no credit card
+            {isSignedIn ? 'Go to dashboard' : 'Start free — no credit card'}
             <ArrowRight className="h-4 w-4" />
           </Link>
           <a
@@ -587,13 +599,13 @@ function CtaSection() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/login"
+              to="/app/dashboard"
               className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold px-10 py-4 rounded-xl text-lg hover:bg-primary/90 transition-all glow-amber"
             >
               Start free <ArrowRight className="h-5 w-5" />
             </Link>
             <Link
-              to="/login"
+              to="/demo"
               className="inline-flex items-center justify-center gap-2 border border-border text-foreground font-medium px-10 py-4 rounded-xl text-lg hover:bg-secondary transition-colors"
             >
               View demo
@@ -688,11 +700,13 @@ function Footer() {
 
 export default function LandingPage() {
   const scrolled = useScrolled()
+  const { isSignedIn } = useClerkAuth()
+  const signedIn = !!isSignedIn
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Nav scrolled={scrolled} />
-      <Hero />
+      <Nav scrolled={scrolled} isSignedIn={signedIn} />
+      <Hero isSignedIn={signedIn} />
       <ProblemSection />
       <HowItWorks />
       <DemoPreview />

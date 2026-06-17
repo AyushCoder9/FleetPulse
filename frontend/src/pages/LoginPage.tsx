@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { SignIn } from '@clerk/clerk-react'
+import { Link, Navigate } from 'react-router-dom'
+import { SignIn, useAuth as useClerkAuth } from '@clerk/clerk-react'
 import Logo from '@/components/Logo'
 import { ArrowLeft } from 'lucide-react'
 
@@ -69,6 +69,9 @@ const clerkAppearance = {
 }
 
 export default function LoginPage() {
+  const { isSignedIn, isLoaded } = useClerkAuth()
+  if (isLoaded && isSignedIn) return <Navigate to="/app/dashboard" replace />
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left panel */}
@@ -133,7 +136,7 @@ export default function LoginPage() {
 
           {/* Clerk handles all auth: Google OAuth + email/password */}
           <SignIn
-            routing="hash"
+            routing="virtual"
             afterSignInUrl="/app/dashboard"
             afterSignUpUrl="/app/dashboard"
             appearance={clerkAppearance}

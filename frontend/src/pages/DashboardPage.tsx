@@ -1,15 +1,18 @@
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
 import {
   BarChart, Bar, LineChart, Line,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   PieChart, Pie, Cell,
 } from 'recharts'
-import { DollarSign, AlertTriangle, Truck, TrendingUp, Activity, ChevronRight } from 'lucide-react'
+import { DollarSign, AlertTriangle, Truck, TrendingUp, Activity, ChevronRight, Upload } from 'lucide-react'
 import { api } from '@/lib/api'
 import { chartData } from '@/lib/mock-data'
 import { Link } from 'react-router-dom'
+import { ImportModal } from '@/components/ImportModal'
 
 function fmtCurrency(n: number) {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`
@@ -92,6 +95,8 @@ function KpiCard({
 }
 
 export default function DashboardPage() {
+  const queryClient = useQueryClient()
+  const [importOpen, setImportOpen] = useState(false)
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard'],
     queryFn: api.dashboard,
@@ -107,9 +112,19 @@ export default function DashboardPage() {
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">Fleet spend & operations at a glance</p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Activity className="h-3.5 w-3.5 text-primary" />
-          <span>Live data</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Activity className="h-3.5 w-3.5 text-primary" />
+            <span>Live data</span>
+          </div>
+          <Button
+            onClick={() => setImportOpen(true)}
+            size="sm"
+            className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            <Upload className="h-3.5 w-3.5" />
+            Import Invoices
+          </Button>
         </div>
       </div>
 
@@ -299,6 +314,15 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      <ImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onDone={() => {
+          queryClient.invalidateQueries({ queryKey: ['invoices'] })
+          queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+        }}
+      />
     </div>
   )
 }
