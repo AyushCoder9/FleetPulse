@@ -70,7 +70,8 @@ const clerkAppearance = {
 
 export default function LoginPage() {
   const { isSignedIn, isLoaded } = useClerkAuth()
-  if (isLoaded && isSignedIn) return <Navigate to="/app/dashboard" replace />
+  if (!isLoaded) return <div className="min-h-screen bg-background" />
+  if (isSignedIn) return <Navigate to="/app/dashboard" replace />
 
   return (
     <div className="min-h-screen bg-background flex">
