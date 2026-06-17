@@ -127,21 +127,28 @@ class TestVehicles:
         return res.data['results'] if 'results' in res.data else res.data
 
     def test_list_vehicles_scoped_to_org(self, auth_client, org):
-        VehicleFactory(organization=org)
-        VehicleFactory(organization=org)
-        VehicleFactory(organization=OrganizationFactory())
+        supplier = SupplierFactory()
+        v1 = VehicleFactory(organization=org)
+        v2 = VehicleFactory(organization=org)
+        InvoiceFactory(organization=org, vehicle=v1, supplier=supplier)
+        InvoiceFactory(organization=org, vehicle=v2, supplier=supplier)
+        other_org = OrganizationFactory()
+        other_v = VehicleFactory(organization=other_org)
+        InvoiceFactory(organization=other_org, vehicle=other_v, supplier=supplier)
 
         res = auth_client.get('/api/v1/vehicles/')
         assert res.status_code == status.HTTP_200_OK
         assert len(self._results(res)) == 2
 
     def test_vehicle_fields(self, auth_client, org):
-        VehicleFactory(organization=org, make='Honda', model='CR-V', status='idle')
+        supplier = SupplierFactory()
+        v = VehicleFactory(organization=org, make='Honda', model='CR-V', status='idle')
+        InvoiceFactory(organization=org, vehicle=v, supplier=supplier)
         res = auth_client.get('/api/v1/vehicles/')
-        v = self._results(res)[0]
-        assert v['make'] == 'Honda'
-        assert v['model'] == 'CR-V'
-        assert v['status'] == 'idle'
+        result = self._results(res)[0]
+        assert result['make'] == 'Honda'
+        assert result['model'] == 'CR-V'
+        assert result['status'] == 'idle'
 
 
 # ── Suppliers ─────────────────────────────────────────────────────────────────

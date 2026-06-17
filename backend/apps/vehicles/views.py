@@ -10,5 +10,6 @@ class VehicleViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Vehicle.objects.filter(
-            organization__memberships__user=self.request.user
-        )
+            organization__memberships__user=self.request.user,
+            invoices__is_deleted=False,
+        ).distinct()

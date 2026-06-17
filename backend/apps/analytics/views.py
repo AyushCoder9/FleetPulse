@@ -66,9 +66,9 @@ class FleetHealthView(APIView):
 
         status_counts = (
             Vehicle.objects
-            .filter(organization=org)
+            .filter(organization=org, invoices__is_deleted=False)
             .values('status')
-            .annotate(count=Count('id'))
+            .annotate(count=Count('id', distinct=True))
         )
 
         idle_cost = (
